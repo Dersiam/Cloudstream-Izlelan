@@ -138,7 +138,7 @@ class Kidd : MainAPI() {
         val description = document.select("div.info-description p").last()?.text()?.trim()
         val tags = document.selectFirst("dt:contains(Tür:) + dd")?.text()?.split(", ")
         val rating =
-            document.selectFirst("dt:contains(IMDB Puanı:) + dd")?.text()?.trim()??.toIntOrNull()
+            document.selectFirst("dt:contains(IMDB Puanı:) + dd")?.text()?.trim()?.toIntOrNull()
         val year =
             document.selectFirst("dt:contains(Yapım Yılı:) + dd")?.text()?.trim()?.toIntOrNull()
 
