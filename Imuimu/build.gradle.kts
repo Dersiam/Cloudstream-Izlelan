@@ -1,0 +1,9 @@
+cloudstream {
+    name = "Imu (imu)"
+    description = "Film • Dizi - [https://imu.com]"
+    authors = listOf("izlelan")
+    status = 1
+    tvTypes = listOf("Movie", "TvSeries")
+    language = "tr"
+    iconUrl = "https://izlelan.com/favicon.ico"
+}

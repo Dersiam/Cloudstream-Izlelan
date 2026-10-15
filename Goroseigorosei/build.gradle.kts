@@ -1,0 +1,9 @@
+cloudstream {
+    name = "Gorosei (gorosei)"
+    description = "Film • Dizi - [https://gorosei.com]"
+    authors = listOf("izlelan")
+    status = 1
+    tvTypes = listOf("Movie", "TvSeries")
+    language = "tr"
+    iconUrl = "https://izlelan.com/favicon.ico"
+}
