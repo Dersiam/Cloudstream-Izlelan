@@ -33,7 +33,7 @@ import org.jsoup.nodes.Element
 
 class Oden : MainAPI() {
     override var mainUrl = "https://yabanci-dizi.now"
-    override var name = "Oden (YabancıDizi)"
+    override var name = "Oden"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = false

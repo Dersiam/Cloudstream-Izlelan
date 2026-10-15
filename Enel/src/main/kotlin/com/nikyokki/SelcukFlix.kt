@@ -36,7 +36,7 @@ import java.util.Calendar
 
 class Enel : MainAPI() {
     override var mainUrl = "https://selcukflix.app"
-    override var name = "Enel (SelcukFlix)"
+    override var name = "Enel"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = false

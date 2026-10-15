@@ -18,7 +18,7 @@ import org.jsoup.Jsoup
 
 class Teach : MainAPI() {
     override var mainUrl = "https://ddizibox.com"
-    override var name = "Teach (DiziBox)"
+    override var name = "Teach"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = false

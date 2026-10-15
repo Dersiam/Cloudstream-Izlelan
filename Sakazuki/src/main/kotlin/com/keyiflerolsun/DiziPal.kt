@@ -12,7 +12,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 
 class Sakazuki : MainAPI() {
     override var mainUrl = "https://dizipal2140.com"
-    override var name = "Sakazuki (DiziPal)"
+    override var name = "Sakazuki"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = true

@@ -7,7 +7,7 @@ import org.jsoup.nodes.Element
 
 class Doflamingo : MainAPI() {
     override var mainUrl = "https://asyawatch.com"
-    override var name = "Doflamingo (AsyaWatch)"
+    override var name = "Doflamingo"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = true

@@ -39,7 +39,7 @@ import java.util.Calendar
 
 class Crocodile : MainAPI() {
     override var mainUrl = "https://dizilla.now"
-    override var name = "Crocodile (Dizilla)"
+    override var name = "Crocodile"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = true

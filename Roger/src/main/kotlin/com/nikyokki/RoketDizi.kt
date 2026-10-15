@@ -30,7 +30,7 @@ import org.jsoup.nodes.Element
 
 class Roger : MainAPI() {
     override var mainUrl = "https://roketdizi.life"
-    override var name = "Roger (RoketDizi)"
+    override var name = "Roger"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = true

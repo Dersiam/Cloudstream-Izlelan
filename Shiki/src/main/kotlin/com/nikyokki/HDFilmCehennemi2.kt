@@ -31,7 +31,7 @@ import org.jsoup.nodes.Element
 
 class Shiki : MainAPI() {
     override var mainUrl = "https://www.hdfilmcehennemi2.biz"
-    override var name = "Shiki (HDFilmCehennemi2)"
+    override var name = "Shiki"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = false

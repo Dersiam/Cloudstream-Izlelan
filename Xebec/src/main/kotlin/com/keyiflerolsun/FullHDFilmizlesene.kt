@@ -18,7 +18,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 
 class Xebec : MainAPI() {
     override var mainUrl = "https://www.fullhdfilmizlesene.now"
-    override var name = "Xebec (FullHDFilm)"
+    override var name = "Xebec"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = false

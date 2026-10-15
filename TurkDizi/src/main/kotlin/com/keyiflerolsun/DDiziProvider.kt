@@ -12,7 +12,7 @@ import org.jsoup.nodes.Element
 
 class TurkDizi : MainAPI() {
     override var mainUrl = "https://turkdizi.com"
-    override var name = "TurkDizi (DDizi)"
+    override var name = "TurkDizi"
     override var lang                 = "tr"
     override val hasMainPage         = true
     override val hasChromecastSupport = true

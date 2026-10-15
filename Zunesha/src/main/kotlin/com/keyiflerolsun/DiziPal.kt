@@ -12,7 +12,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 
 class Zunesha : MainAPI() {
     override var mainUrl = "https://dizipal10.com.tr"
-    override var name = "Zunesha (DiziPal)"
+    override var name = "Zunesha"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = true

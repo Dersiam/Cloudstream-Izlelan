@@ -11,7 +11,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 
 class Fujitora : MainAPI() {
     override var mainUrl = "https://animecix.tv"
-    override var name = "Fujitora (AnimeciX)"
+    override var name = "Fujitora"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = false

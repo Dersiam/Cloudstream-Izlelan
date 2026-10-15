@@ -32,7 +32,7 @@ import org.jsoup.nodes.Element
 
 class Kidd : MainAPI() {
     override var mainUrl = "https://filmmakinesi.to"
-    override var name = "Kidd (FilmMakinesi)"
+    override var name = "Kidd"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = false

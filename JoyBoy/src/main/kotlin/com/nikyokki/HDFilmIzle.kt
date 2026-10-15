@@ -17,7 +17,7 @@ import org.jsoup.Jsoup
 
 class JoyBoy : MainAPI() {
     override var mainUrl = "https://www.hdfilmizle.best"
-    override var name = "JoyBoy (HDFilmIzle)"
+    override var name = "JoyBoy"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = true

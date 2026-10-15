@@ -41,7 +41,7 @@ import org.jsoup.nodes.Element
 
 class Kizaru : MainAPI() {
     override var mainUrl = "https://www.hdfilmcehennemi.nl"
-    override var name = "Kizaru (HDFilmCehennemi)"
+    override var name = "Kizaru"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = true

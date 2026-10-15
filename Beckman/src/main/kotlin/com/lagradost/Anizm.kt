@@ -12,7 +12,7 @@ import org.jsoup.nodes.Element
 
 class Beckman : MainAPI() {
     override var mainUrl = "https://api.sonanime.com"
-    override var name = "Beckman (SonAnime)"
+    override var name = "Beckman"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasDownloadSupport = true

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 
 class Smoker : MainAPI() {
     override var mainUrl = "https://dizipal1590.com"
-    override var name = "Smoker (DiziPal)"
+    override var name = "Smoker"
     override val hasMainPage          = true
     override var lang                 = "tr"
     override val hasQuickSearch       = true
