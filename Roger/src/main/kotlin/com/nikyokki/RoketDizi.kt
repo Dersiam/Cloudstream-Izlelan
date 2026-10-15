@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION", "DEPRECATION_ERROR", "UNCHECKED_CAST")
 
 
 package com.nikyokki
@@ -23,7 +24,6 @@ import com.lagradost.cloudstream3.newMovieLoadResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.newTvSeriesSearchResponse
-import com.lagradost.cloudstream3.toRatingInt
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
@@ -176,7 +176,7 @@ class Roger : MainAPI() {
             val tags = document.selectFirst("div.poster.hidden h3")?.text()?.split(",")?.map { it }
             val rating =
                 document.selectFirst("div.flex.items-center")?.selectFirst("span.text-white.text-sm")
-                    ?.text()?.trim().toRatingInt()
+                    ?.text()?.trim()?.toIntOrNull()
             val actors = document.select("div.global-box h5").map {
                 Actor(it.text())
             }
@@ -208,7 +208,7 @@ class Roger : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                // this.rating = rating
                 addActors(actors)
             }
         } else {
@@ -224,7 +224,7 @@ class Roger : MainAPI() {
             val tags = document.select("div.text-white.text-md.opacity-90.flex.items-center.gap-2.overflow-auto.mt-1 a").map { it.text() }
             val rating =
                 document.selectFirst("div.flex.items-center")?.selectFirst("span.text-white.text-sm")
-                    ?.text()?.trim().toRatingInt()
+                    ?.text()?.trim()?.toIntOrNull()
             val actors = mutableListOf<Actor>()
             document.select("div.w-fit.min-w-fit.rounded-lg") .forEach { a ->
                 if (a.selectFirst("span")?.text()?.contains("Aktör") == true) {
@@ -235,7 +235,7 @@ class Roger : MainAPI() {
                 this.posterUrl       = poster
                 this.year            = yil
                 this.plot            = description
-                this.rating          = rating
+                // this.rating          = rating
                 this.tags            = tags
                 addActors(actors)
             }

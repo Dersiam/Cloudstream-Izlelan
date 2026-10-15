@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION", "DEPRECATION_ERROR", "UNCHECKED_CAST")
 // ! Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
 
 package com.keyiflerolsun
@@ -24,7 +25,6 @@ import com.lagradost.cloudstream3.newMovieLoadResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.newTvSeriesSearchResponse
-import com.lagradost.cloudstream3.toRatingInt
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
@@ -138,7 +138,7 @@ class Kidd : MainAPI() {
         val description = document.select("div.info-description p").last()?.text()?.trim()
         val tags = document.selectFirst("dt:contains(Tür:) + dd")?.text()?.split(", ")
         val rating =
-            document.selectFirst("dt:contains(IMDB Puanı:) + dd")?.text()?.trim()?.toRatingInt()
+            document.selectFirst("dt:contains(IMDB Puanı:) + dd")?.text()?.trim()??.toIntOrNull()
         val year =
             document.selectFirst("dt:contains(Yapım Yılı:) + dd")?.text()?.trim()?.toIntOrNull()
 
@@ -181,7 +181,7 @@ class Kidd : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.rating = rating
+                // this.rating = rating
                 addActors(actors)
                 addTrailer(trailer)
             }
@@ -191,7 +191,7 @@ class Kidd : MainAPI() {
             this.year = year
             this.plot = description
             this.tags = tags
-            this.rating = rating
+            // this.rating = rating
             this.duration = duration
             this.recommendations = recommendations
             addActors(actors)

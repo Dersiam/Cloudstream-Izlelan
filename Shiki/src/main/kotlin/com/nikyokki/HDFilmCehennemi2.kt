@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION", "DEPRECATION_ERROR", "UNCHECKED_CAST")
 package com.nikyokki
 
 import android.util.Log
@@ -21,7 +22,6 @@ import com.lagradost.cloudstream3.newMovieLoadResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.newTvSeriesSearchResponse
-import com.lagradost.cloudstream3.toRatingInt
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.getQualityFromName
@@ -119,7 +119,7 @@ class Shiki : MainAPI() {
         val description = document.selectFirst("article.text-white p")?.text()?.trim()
         var year = document.selectFirst("div.release a")?.text()?.trim()?.toIntOrNull()
         val tags = document.select("div#listelements a").map { it.text() }
-        val rating = document.selectFirst("div.rate")?.text().toRatingInt()
+        val rating = document.selectFirst("div.rate")?.text()?.toIntOrNull()
         val actors = mutableListOf<Actor>()
         val trailer = document.selectFirst("div.nav-link")?.attr("data-trailer")
         val listItems = document.select("tbody tr").select("div")
@@ -141,7 +141,7 @@ class Shiki : MainAPI() {
                 this.plot = description
                 this.year = year
                 this.tags = tags
-                this.rating = rating
+                // this.rating = rating
                 this.duration = duration
                 this.recommendations = recommendations
                 addActors(actors)
@@ -164,7 +164,7 @@ class Shiki : MainAPI() {
             this.plot = description
             this.year = year
             this.tags = tags
-            this.rating = rating
+            // this.rating = rating
             this.duration = duration
             addActors(actors)
             trailer?.takeIf { it.isNotBlank() }?.let { addTrailer(it) }
