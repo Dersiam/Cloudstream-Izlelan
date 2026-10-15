@@ -1,0 +1,8 @@
+{
+  "name": "Cloudstream Izlelan",
+  "description": "Cloudstream-Izlelan Türkçe Sağlayıcı Deposu",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/plugins.json"
+  ]
+}

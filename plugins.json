@@ -1,0 +1,905 @@
+[
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Aceace.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Aceace",
+        "internalName": "Aceace",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://ace.com]",
+        "fileSize": 8206,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-3d84ecde953303c72de974c6ddbe9b571e45d779084d68713b75de7255002706"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Beckmanbeckman.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Beckmanbeckman",
+        "internalName": "Beckmanbeckman",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Anime - [https://beckman.com]",
+        "fileSize": 8206,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-9a41420a30dd983507ca73cff78a107fcdbd211d03f5e528a81140a9aadab41a"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Bogardbogard.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Bogardbogard",
+        "internalName": "Bogardbogard",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://bogard.com]",
+        "fileSize": 8191,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-7700d2ce00919cb7c0fecb6b1de383fdc3b3031769235448dcdf42c0819264ee"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Cloverclover.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Cloverclover",
+        "internalName": "Cloverclover",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://clover.com]",
+        "fileSize": 8194,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-aebceaaea76a5324fdbb7004f4501d44ac49daa72b8c096dfd18f722e118adb2"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Crocodilecrocodile.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Crocodilecrocodile",
+        "internalName": "Crocodilecrocodile",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Dizi - [https://crocodile.com]",
+        "fileSize": 8216,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-141dd121e901bab893d618d0bda56881c422421be6ee0e24688b814eac944411"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Doflamingodoflamingo.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Doflamingodoflamingo",
+        "internalName": "Doflamingodoflamingo",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://doflamingo.com]",
+        "fileSize": 8208,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-41c1638fb807649282181e42df5a8417997e604e1d195d0c2cc7d875c3c78db2"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Dragondragon.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Dragondragon",
+        "internalName": "Dragondragon",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://dragon.com]",
+        "fileSize": 8188,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-76fe8172a552bfa3f069b86e9f89acf3a132d44681f4006106eb9d8b95ca7e90"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Enelenel.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Enelenel",
+        "internalName": "Enelenel",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://enel.com]",
+        "fileSize": 8202,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-5c6db55392ac204b31ed9abc89945f23e03446c4e42c8f73a7472310d5f8902e"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Fujitorafujitora.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Fujitorafujitora",
+        "internalName": "Fujitorafujitora",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Anime - [https://fujitora.com]",
+        "fileSize": 8209,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-d8b4bf702924a9d65e9fd176c3f7f9e4971fc7c77f55a68b437e8d601e7208e1"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Gabangaban.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Gabangaban",
+        "internalName": "Gabangaban",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://gaban.com]",
+        "fileSize": 8192,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-3c5c38bd3c4c9b804e94a5036643cf43a74d05aa9c0f1885a2a62fba27d55fd7"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Garlinggarling.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Garlinggarling",
+        "internalName": "Garlinggarling",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://garling.com]",
+        "fileSize": 8206,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-e03bcdaae3a4c201564abb8c330a445d8b3fa486f5af6949ae13be38fc54e271"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Garpgarp.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Garpgarp",
+        "internalName": "Garpgarp",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film - [https://garp.com]",
+        "fileSize": 8203,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-d46ec50f64e3295cfda1b7d98e907089b81374b3ad2b0a121a36ab7d2f385a6a"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Goroseigorosei.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Goroseigorosei",
+        "internalName": "Goroseigorosei",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://gorosei.com]",
+        "fileSize": 8206,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-f2f8921ac53d85f38d42a868e5ecf4a2ebd7eedf5d4da7a38a0e9fe149a988a4"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Hirilukhiriluk.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Hirilukhiriluk",
+        "internalName": "Hirilukhiriluk",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://hiriluk.com]",
+        "fileSize": 8204,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-2b6e9dd9fd1928c5d5f7281ff7bb8c53251f7a3e1bfbff4e0db5a51efd76bbf5"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Imuimu.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Imuimu",
+        "internalName": "Imuimu",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://imu.com]",
+        "fileSize": 8195,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-f211da619d1af615d847165c458db0cbc1c6855b9d7e401ea44f8eec5cb6109a"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Jinbejinbe.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Jinbejinbe",
+        "internalName": "Jinbejinbe",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://jinbe.com]",
+        "fileSize": 8195,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-ab955137355685f66ed573df5e36e6b57835558a7449e16d8fe0e348f522540f"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/JoyBoyjoyboy.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "JoyBoyjoyboy",
+        "internalName": "JoyBoyjoyboy",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://joyboy.com]",
+        "fileSize": 8199,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-6115d7316c4d19332a842e94d9123fd5b2360281d10ee7dec672aacae728fc3f"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Kalgarakalgara.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kalgarakalgara",
+        "internalName": "Kalgarakalgara",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://kalgara.com]",
+        "fileSize": 8207,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-7d769f9e41a9709517f45f11cd413c39f963dca7bfaeeb9bcfe0db5086a14fae"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Katakurikatakuri.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Katakurikatakuri",
+        "internalName": "Katakurikatakuri",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://katakuri.com]",
+        "fileSize": 8224,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-311ac7a4f329ef2d9b56f80d273ee7e7251f4997d522b6e90b27612f0419e0e5"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Kiddkidd.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kiddkidd",
+        "internalName": "Kiddkidd",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://kidd.com]",
+        "fileSize": 8214,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-6c938b89fd73ac045492d92f18f5144c375f773c7d790b0b586d9d0d5e896ad0"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Kizarukizaru.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kizarukizaru",
+        "internalName": "Kizarukizaru",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://kizaru.com]",
+        "fileSize": 8193,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-e28f07f77fe51b25342648a3f5ef3f5d560939c23cb036e82261f2a5ba125fec"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Kuzankuzan.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kuzankuzan",
+        "internalName": "Kuzankuzan",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film - [https://kuzan.com]",
+        "fileSize": 8197,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-5df6de00e8149a10ae4562b28ab9c4cd43d76377124eae392286f644b7555377"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Lililili.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Lililili",
+        "internalName": "Lililili",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Anime - [https://lili.com]",
+        "fileSize": 8193,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-734487885005b708a92b72fc25ebd9c46d8f36b86c51d9fb4facdf89893d7b31"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Mihawkmihawk.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Mihawkmihawk",
+        "internalName": "Mihawkmihawk",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://mihawk.com]",
+        "fileSize": 8196,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-e19e449eddfe6bab4c4391f0492d2ec6a1d6e0afb47be586a81d9649c7582f21"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Nolandnoland.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Nolandnoland",
+        "internalName": "Nolandnoland",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://noland.com]",
+        "fileSize": 8195,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-c1507303bfbc686e7b757118dcdf86c2ed118584c9fb39de33204782c05aad76"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Odenoden.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Odenoden",
+        "internalName": "Odenoden",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://oden.com]",
+        "fileSize": 8209,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-99469d11e882f843b7ff6365528eb5dc39375dfdaf1ac44811475a824ce23ee2"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Rayleighrayleigh.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Rayleighrayleigh",
+        "internalName": "Rayleighrayleigh",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://rayleigh.com]",
+        "fileSize": 8220,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-8c3af0039a49a67ae8da7880d6a66fd7978208861b099be47116664bafe7f204"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Rogerroger.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Rogerroger",
+        "internalName": "Rogerroger",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://roger.com]",
+        "fileSize": 8192,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-6b071a2e9995bb9b03a51954682c316dec9ff183961ac314a298e215cb950d44"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Rougerouge.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Rougerouge",
+        "internalName": "Rougerouge",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://rouge.com]",
+        "fileSize": 8196,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-c1870d69097d533ef94a357a1d81beebacbc62e00b00536702a0fb5910ca99ad"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Ryumaryuma.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Ryumaryuma",
+        "internalName": "Ryumaryuma",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film - [https://ryuma.com]",
+        "fileSize": 8194,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-a9edb5c6a4785e6dfbf614bfd5d1367c8db201bd2a2439276f2dafb407201bb3"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Sabosabo.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Sabosabo",
+        "internalName": "Sabosabo",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Anime - [https://sabo.com]",
+        "fileSize": 8199,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-0a0329595cabdeacd7d8327f4774771b75e0b5207b2d5a6fd2b917247efa1ffb"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Sakazukisakazuki.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Sakazukisakazuki",
+        "internalName": "Sakazukisakazuki",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://sakazuki.com]",
+        "fileSize": 8221,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-c4dae2d6f47d36c6d4d5c307c23a7ed7220d73a91afcbef97568d1eeec7b1ade"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Sengokusengoku.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Sengokusengoku",
+        "internalName": "Sengokusengoku",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Dizi - [https://sengoku.com]",
+        "fileSize": 8202,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-1251290e15c72078def54e7d7d522e3677cc946e049d7003c8e84e90969dade6"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Shamrockshamrock.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Shamrockshamrock",
+        "internalName": "Shamrockshamrock",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Anime - [https://shamrock.com]",
+        "fileSize": 8216,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-0995d9be87f1d3a8499e525a33833ec3716906b33fcb42e50d40c820b9cc0a98"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Shanksshanks.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Shanksshanks",
+        "internalName": "Shanksshanks",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://shanks.com]",
+        "fileSize": 8194,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-278c9709d5ed5b0dd248c214ab5db625276975f00ed0109e8401af13b5640e05"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Shikishiki.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Shikishiki",
+        "internalName": "Shikishiki",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://shiki.com]",
+        "fileSize": 8194,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-e6a29b300d032e2953e8eda7c0b70373e7d29f95f7a58e506b8adcb5f8c54622"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Smokersmoker.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Smokersmoker",
+        "internalName": "Smokersmoker",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://smoker.com]",
+        "fileSize": 8193,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-f7bf73aeea35ba5489c4279174cf5905a76c8fb1b5bf102b54fc7cd85f2e0531"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Teachteach.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Teachteach",
+        "internalName": "Teachteach",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://teach.com]",
+        "fileSize": 8191,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-6b38b3195bc3c58eb1b80fdce47d21b185cc6a30f18e4667ffa5604012b215f6"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Tokitoki.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Tokitoki",
+        "internalName": "Tokitoki",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://toki.com]",
+        "fileSize": 8202,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-1810cea282d40c0d4196a4c805482052d021e837a6f11af33a0e10e71680ba45"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/TurkDiziturkdizi.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "TurkDiziturkdizi",
+        "internalName": "TurkDiziturkdizi",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Test A\u015famas\u0131nda - [https://turkdizi.com]",
+        "fileSize": 8219,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-87b58ececd9b8e841f85d0951a416a2aa358b0b2cb1853ca7689c161dbb4cfe0"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Urougeurouge.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Urougeurouge",
+        "internalName": "Urougeurouge",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film \u2022 Dizi - [https://urouge.com]",
+        "fileSize": 8193,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-47bf63a21542771c2e1784f453d8d77d7b40053ca72833af17c01a1b5679cf57"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Xebecxebec.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Xebecxebec",
+        "internalName": "Xebecxebec",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Film - [https://xebec.com]",
+        "fileSize": 8185,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-ea9bbb32de1577d29acae0be63b9c9355b611cece12170fe39456902380a9e16"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Zuneshazunesha.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Zuneshazunesha",
+        "internalName": "Zuneshazunesha",
+        "authors": [
+            "izlelan"
+        ],
+        "description": "Dizi - [https://zunesha.com]",
+        "fileSize": 8203,
+        "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
+        "language": "tr",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://izlelan.com/favicon.ico",
+        "apiVersion": 1,
+        "fileHash": "sha256-e42e97b741dc48fc533f7bc0b4ad3a0dddce36e10e2ce8c0f6142bc797d243b4"
+    }
+]
