@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Sengoku (sengoku)"
     description = "Dizi - [https://sengoku.com]"
     authors = listOf("izlelan")
     status = 1

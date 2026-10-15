@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Shiki (shiki)"
     description = "Film • Dizi - [https://shiki.com]"
     authors = listOf("izlelan")
     status = 1

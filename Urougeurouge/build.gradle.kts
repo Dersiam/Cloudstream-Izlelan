@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Urouge (urouge)"
     description = "Film • Dizi - [https://urouge.com]"
     authors = listOf("izlelan")
     status = 1

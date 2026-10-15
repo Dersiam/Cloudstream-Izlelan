@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Kalgara (kalgara)"
     description = "Film • Dizi - [https://kalgara.com]"
     authors = listOf("izlelan")
     status = 1

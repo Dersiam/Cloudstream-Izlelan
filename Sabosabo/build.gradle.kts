@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Sabo (sabo)"
     description = "Anime - [https://sabo.com]"
     authors = listOf("izlelan")
     status = 1

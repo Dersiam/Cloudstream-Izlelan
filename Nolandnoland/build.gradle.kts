@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Noland (noland)"
     description = "Film • Dizi - [https://noland.com]"
     authors = listOf("izlelan")
     status = 1

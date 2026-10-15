@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Fujitora (fujitora)"
     description = "Anime - [https://fujitora.com]"
     authors = listOf("izlelan")
     status = 1

@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Ryuma (ryuma)"
     description = "Film - [https://ryuma.com]"
     authors = listOf("izlelan")
     status = 1

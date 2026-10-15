@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Dragon (dragon)"
     description = "Film • Dizi - [https://dragon.com]"
     authors = listOf("izlelan")
     status = 1

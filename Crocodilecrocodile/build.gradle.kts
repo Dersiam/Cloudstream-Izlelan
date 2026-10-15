@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Crocodile (crocodile)"
     description = "Dizi - [https://crocodile.com]"
     authors = listOf("izlelan")
     status = 1

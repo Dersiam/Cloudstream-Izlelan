@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Rayleigh (rayleigh)"
     description = "Film • Dizi - [https://rayleigh.com]"
     authors = listOf("izlelan")
     status = 1

@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Smoker (smoker)"
     description = "Film • Dizi - [https://smoker.com]"
     authors = listOf("izlelan")
     status = 1

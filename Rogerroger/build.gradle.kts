@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Roger (roger)"
     description = "Film • Dizi - [https://roger.com]"
     authors = listOf("izlelan")
     status = 1

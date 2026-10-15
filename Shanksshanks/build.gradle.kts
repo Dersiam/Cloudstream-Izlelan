@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Shanks (shanks)"
     description = "Film • Dizi - [https://shanks.com]"
     authors = listOf("izlelan")
     status = 1

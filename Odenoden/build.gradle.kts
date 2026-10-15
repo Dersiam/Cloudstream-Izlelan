@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Oden (oden)"
     description = "Film • Dizi - [https://oden.com]"
     authors = listOf("izlelan")
     status = 1

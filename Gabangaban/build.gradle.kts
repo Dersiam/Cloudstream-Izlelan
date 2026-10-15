@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Gaban (gaban)"
     description = "Film • Dizi - [https://gaban.com]"
     authors = listOf("izlelan")
     status = 1

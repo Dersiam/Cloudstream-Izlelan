@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "TurkDizi (turkdizi)"
     description = "Test Aşamasında - [https://turkdizi.com]"
     authors = listOf("izlelan")
     status = 1

@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Zunesha (zunesha)"
     description = "Dizi - [https://zunesha.com]"
     authors = listOf("izlelan")
     status = 1

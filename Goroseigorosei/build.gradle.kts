@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Gorosei (gorosei)"
     description = "Film • Dizi - [https://gorosei.com]"
     authors = listOf("izlelan")
     status = 1

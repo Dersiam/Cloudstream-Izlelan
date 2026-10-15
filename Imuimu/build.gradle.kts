@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Imu (imu)"
     description = "Film • Dizi - [https://imu.com]"
     authors = listOf("izlelan")
     status = 1

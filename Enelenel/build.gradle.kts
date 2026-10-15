@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Enel (enel)"
     description = "Film • Dizi - [https://enel.com]"
     authors = listOf("izlelan")
     status = 1

@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Hiriluk (hiriluk)"
     description = "Film • Dizi - [https://hiriluk.com]"
     authors = listOf("izlelan")
     status = 1

@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Sakazuki (sakazuki)"
     description = "Film • Dizi - [https://sakazuki.com]"
     authors = listOf("izlelan")
     status = 1

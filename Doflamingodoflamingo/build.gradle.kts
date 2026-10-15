@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Doflamingo (doflamingo)"
     description = "Film • Dizi - [https://doflamingo.com]"
     authors = listOf("izlelan")
     status = 1

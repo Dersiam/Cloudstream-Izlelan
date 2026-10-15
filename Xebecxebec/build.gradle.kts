@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Xebec (xebec)"
     description = "Film - [https://xebec.com]"
     authors = listOf("izlelan")
     status = 1

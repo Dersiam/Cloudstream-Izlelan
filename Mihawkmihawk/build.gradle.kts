@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Mihawk (mihawk)"
     description = "Film • Dizi - [https://mihawk.com]"
     authors = listOf("izlelan")
     status = 1

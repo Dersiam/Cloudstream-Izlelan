@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Clover (clover)"
     description = "Film • Dizi - [https://clover.com]"
     authors = listOf("izlelan")
     status = 1

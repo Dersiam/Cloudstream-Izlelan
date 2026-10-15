@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Kizaru (kizaru)"
     description = "Film • Dizi - [https://kizaru.com]"
     authors = listOf("izlelan")
     status = 1

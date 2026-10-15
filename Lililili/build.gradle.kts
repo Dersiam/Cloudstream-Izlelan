@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Lili (lili)"
     description = "Anime - [https://lili.com]"
     authors = listOf("izlelan")
     status = 1

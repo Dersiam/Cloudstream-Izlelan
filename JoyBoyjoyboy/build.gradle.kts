@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "JoyBoy (joyboy)"
     description = "Film • Dizi - [https://joyboy.com]"
     authors = listOf("izlelan")
     status = 1

@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Toki (toki)"
     description = "Film • Dizi - [https://toki.com]"
     authors = listOf("izlelan")
     status = 1

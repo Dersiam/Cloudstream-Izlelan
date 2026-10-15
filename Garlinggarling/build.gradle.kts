@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Garling (garling)"
     description = "Film • Dizi - [https://garling.com]"
     authors = listOf("izlelan")
     status = 1

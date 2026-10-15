@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Kuzan (kuzan)"
     description = "Film - [https://kuzan.com]"
     authors = listOf("izlelan")
     status = 1

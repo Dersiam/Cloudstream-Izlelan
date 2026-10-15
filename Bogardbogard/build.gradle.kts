@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Bogard (bogard)"
     description = "Film • Dizi - [https://bogard.com]"
     authors = listOf("izlelan")
     status = 1

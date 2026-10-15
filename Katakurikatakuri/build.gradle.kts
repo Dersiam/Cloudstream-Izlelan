@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Katakuri (katakuri)"
     description = "Film • Dizi - [https://katakuri.com]"
     authors = listOf("izlelan")
     status = 1

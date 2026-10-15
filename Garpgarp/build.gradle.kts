@@ -1,5 +1,6 @@
+version = 1
+
 cloudstream {
-    name = "Garp (garp)"
     description = "Film - [https://garp.com]"
     authors = listOf("izlelan")
     status = 1
