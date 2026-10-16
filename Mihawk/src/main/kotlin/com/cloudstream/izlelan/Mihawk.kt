@@ -100,7 +100,7 @@ class Mihawk : MainAPI() {
             }
         }
         if (items.isEmpty()) {
-            return getMainPage(1, MainPageRequest(name, "$TMDB_API/tv/popular?api_key=$TMDB_KEY&language=tr-TR&page=", false)).items
+            return getMainPage(1, MainPageRequest(name, "$TMDB_API/tv/popular?api_key=$TMDB_KEY&language=tr-TR&page=", false)).items.flatMap { it.list }
         }
         return items
     }
