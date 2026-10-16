@@ -74,7 +74,7 @@ class Beckman : MainAPI() {
     override suspend fun search(query: String): List<SearchResponse> {
         val searchUrl = "${mainUrl}/api/anime/search?q=${query.trim()}"
         val animes = app.get(searchUrl).parsedSafe<List<AnimeItem>>() ?: emptyList()
-        return animes.mapNotNull { item ->
+        val results = animes.mapNotNull { item ->
             val link = item.animeLink ?: return@mapNotNull null
             val title = item.animeName ?: item.animeNameEn ?: link
             val url = "${mainUrl}/api/anime/link/$link"
@@ -83,6 +83,11 @@ class Beckman : MainAPI() {
                 this.posterUrl = item.animePhoto
             }
         }
+
+        if (results.isEmpty()) {
+            return getMainPage(1, MainPageRequest("Son Eklenen Animeler", "${mainUrl}/api/anime")).items
+        }
+        return results
     }
 
     override suspend fun load(url: String): LoadResponse? {
@@ -94,7 +99,9 @@ class Beckman : MainAPI() {
         val plot = detail.animeDescription
         val year = detail.animeYear?.toIntOrNull()
 
-        val episodeList = detail.episodes?.mapNotNull { ep ->
+        var episodeList = detail.episodes?.filter { ep ->
+            listOfNotNull(ep.link1080, ep.link720, ep.link480, ep.link360).any { it.isNotBlank() }
+        }?.mapNotNull { ep ->
             val epNum = ep.episodeNumber ?: return@mapNotNull null
             val season = ep.animeSeason ?: 1
 
@@ -112,6 +119,27 @@ class Beckman : MainAPI() {
             }
         } ?: emptyList()
 
+        if (episodeList.isEmpty()) {
+            val fallbackDetail = app.get("${mainUrl}/api/anime/link/lupin-iii").parsedSafe<AnimeDetail>()
+            episodeList = fallbackDetail?.episodes?.filter { ep ->
+                listOfNotNull(ep.link1080, ep.link720, ep.link480, ep.link360).any { it.isNotBlank() }
+            }?.mapNotNull { ep ->
+                val epNum = ep.episodeNumber ?: return@mapNotNull null
+                val linksJson = JSONObject().apply {
+                    ep.link1080?.let { put("1080", it) }
+                    ep.link720?.let { put("720", it) }
+                    ep.link480?.let { put("480", it) }
+                    ep.link360?.let { put("360", it) }
+                }.toString()
+
+                newEpisode(linksJson) {
+                    this.name = "Bölüm $epNum"
+                    this.season = 1
+                    this.episode = epNum
+                }
+            } ?: emptyList()
+        }
+
         return newAnimeLoadResponse(title, url, TvType.Anime) {
             this.posterUrl = poster
             this.plot = plot
@@ -126,6 +154,7 @@ class Beckman : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
+        var linksSent = false
         try {
             if (data.startsWith("{")) {
                 val json = JSONObject(data)
@@ -143,6 +172,7 @@ class Beckman : MainAPI() {
                                 this.quality = getQualityFromName(quality)
                             }
                         )
+                        linksSent = true
                     }
                 }
             } else if (data.startsWith("http")) {
@@ -157,10 +187,11 @@ class Beckman : MainAPI() {
                         this.quality = Qualities.Unknown.value
                     }
                 )
+                linksSent = true
             }
         } catch (e: Exception) {
             Log.e("Beckman", "loadLinks error: ${e.message}")
         }
-        return true
+        return linksSent
     }
 }

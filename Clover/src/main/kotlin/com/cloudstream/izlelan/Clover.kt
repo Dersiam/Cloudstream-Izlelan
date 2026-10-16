@@ -18,6 +18,7 @@ class Clover : MainAPI() {
         private const val TMDB_API = "https://api.themoviedb.org/3"
         private const val TMDB_KEY = "500330721680edb6d5f7f12ba7cd9023"
         private const val IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
+        private const val STREAM_CORE = "https://streamcorecdn.com"
     }
 
     override val mainPage = mainPageOf(
@@ -64,7 +65,7 @@ class Clover : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val url = "$TMDB_API/search/multi?api_key=$TMDB_KEY&language=tr-TR&query=$query"
+        val url = "$TMDB_API/search/multi?api_key=$TMDB_KEY&language=tr-TR&query=${query.trim()}"
         val res = app.get(
             url,
             headers = mapOf(
@@ -98,6 +99,10 @@ class Clover : MainAPI() {
                     this.posterUrl = poster
                 })
             }
+        }
+
+        if (items.isEmpty()) {
+            return getMainPage(1, MainPageRequest("Günün Trendleri", mainPage[0].data)).items
         }
         return items
     }
@@ -178,30 +183,99 @@ class Clover : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
+        var streamFound = false
+
         val isTv = data.contains("/embed/tv/")
         val parts = data.substringAfter("/embed/").split("/")
-        val id = parts.getOrNull(1) ?: return true
+        val id = parts.getOrNull(1) ?: return false
 
-        val embedUrls = mutableListOf<String>()
-        if (isTv) {
+        // 1. Direct streamcorecdn extraction
+        val streamCoreUrl = if (isTv) {
             val s = parts.getOrNull(2) ?: "1"
             val e = parts.getOrNull(3) ?: "1"
-            embedUrls.add("https://vixsrc.to/embed/tv/$id/$s/$e")
-            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1&s=$s&e=$e")
-            embedUrls.add("https://vidlink.pro/tv/$id/$s/$e")
-            embedUrls.add("https://vidsrc.to/embed/tv/$id/$s/$e")
+            "$STREAM_CORE/dizi/$id/$s/$e"
         } else {
-            embedUrls.add("https://vixsrc.to/embed/movie/$id")
-            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1")
-            embedUrls.add("https://vidlink.pro/movie/$id")
-            embedUrls.add("https://vidsrc.to/embed/movie/$id")
+            "$STREAM_CORE/film/$id/"
         }
 
-        for (embed in embedUrls) {
-            try {
-                loadExtractor(embed, subtitleCallback, callback)
-            } catch (e: Exception) {}
+        try {
+            val res = app.get(
+                streamCoreUrl,
+                headers = mapOf(
+                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                    "Referer" to "$STREAM_CORE/",
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                )
+            )
+
+            val html = res.text
+            val srcMatch = Regex("""const\s+src\s*=\s*['"]([^'"]+)['"]""").find(html)?.groupValues?.get(1)
+            if (srcMatch != null) {
+                val fullUrl = if (srcMatch.startsWith("http")) srcMatch else "$STREAM_CORE$srcMatch"
+                callback.invoke(
+                    newExtractorLink(
+                        source = this.name,
+                        name = "${this.name} 1080p",
+                        url = fullUrl,
+                        type = ExtractorLinkType.M3U8
+                    ) {
+                        this.referer = "$STREAM_CORE/"
+                        this.quality = Qualities.P1080.value
+                    }
+                )
+                streamFound = true
+            }
+
+            val tracksMatch = Regex("""tracksData\s*=\s*(\{[\s\S]+?\});""").find(html)?.groupValues?.get(1)
+            if (tracksMatch != null) {
+                try {
+                    val tracksObj = JSONObject(tracksMatch)
+                    val tracksArr = tracksObj.optJSONArray("tracks")
+                    if (tracksArr != null) {
+                        for (i in 0 until tracksArr.length()) {
+                            val track = tracksArr.getJSONObject(i)
+                            val file = track.optString("file")
+                            val label = track.optString("label", "Türkçe")
+                            if (file.isNotEmpty()) {
+                                val trackUrl = if (file.startsWith("http")) file else "$STREAM_CORE$file"
+                                subtitleCallback.invoke(
+                                    newSubtitleFile(
+                                        lang = label,
+                                        url = trackUrl
+                                    )
+                                )
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+        } catch (_: Exception) {}
+
+        // 2. Fallback to third-party extractors
+        if (!streamFound) {
+            val embedUrls = if (isTv) {
+                val s = parts.getOrNull(2) ?: "1"
+                val e = parts.getOrNull(3) ?: "1"
+                listOf(
+                    "https://vixsrc.to/embed/tv/$id/$s/$e",
+                    "https://vidlink.pro/tv/$id/$s/$e",
+                    "https://vidsrc.to/embed/tv/$id/$s/$e"
+                )
+            } else {
+                listOf(
+                    "https://vixsrc.to/embed/movie/$id",
+                    "https://vidlink.pro/movie/$id",
+                    "https://vidsrc.to/embed/movie/$id"
+                )
+            }
+
+            for (embed in embedUrls) {
+                try {
+                    loadExtractor(embed, subtitleCallback, callback)
+                } catch (_: Exception) {}
+            }
         }
-        return true
+
+        return streamFound
     }
 }

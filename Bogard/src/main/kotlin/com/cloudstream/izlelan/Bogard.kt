@@ -64,7 +64,7 @@ class Bogard : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val url = "$TMDB_API/search/multi?api_key=$TMDB_KEY&language=tr-TR&query=$query"
+        val url = "$TMDB_API/search/multi?api_key=$TMDB_KEY&language=tr-TR&query=${query.trim()}"
         val res = app.get(
             url,
             headers = mapOf(
@@ -98,6 +98,10 @@ class Bogard : MainAPI() {
                     this.posterUrl = poster
                 })
             }
+        }
+
+        if (items.isEmpty()) {
+            return getMainPage(1, MainPageRequest("Günün Trendleri", mainPage[0].data)).items
         }
         return items
     }
@@ -142,7 +146,7 @@ class Bogard : MainAPI() {
             for (s in 1..numSeasons) {
                 val epCount = seasonEpCounts[s] ?: 10
                 for (e in 1..epCount) {
-                    episodes.add(newEpisode("$mainUrl/embed/tv/$id/$s/$e") {
+                    episodes.add(newEpisode("$mainUrl/dizi/$id/$s/$e") {
                         this.name = "$s. Sezon $e. Bölüm"
                         this.season = s
                         this.episode = e
@@ -150,7 +154,7 @@ class Bogard : MainAPI() {
                 }
             }
             if (episodes.isEmpty()) {
-                episodes.add(newEpisode("$mainUrl/embed/tv/$id/1/1") {
+                episodes.add(newEpisode("$mainUrl/dizi/$id/1/1") {
                     this.name = "1. Sezon 1. Bölüm"
                     this.season = 1
                     this.episode = 1
@@ -163,7 +167,7 @@ class Bogard : MainAPI() {
                 this.rating = rating.toInt()
             }
         } else {
-            return newMovieLoadResponse(title, url, TvType.Movie, "$mainUrl/embed/movie/$id") {
+            return newMovieLoadResponse(title, url, TvType.Movie, "$mainUrl/film/$id/") {
                 this.posterUrl = poster
                 this.plot = overview
                 this.year = year
@@ -178,30 +182,91 @@ class Bogard : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val isTv = data.contains("/embed/tv/")
-        val parts = data.substringAfter("/embed/").split("/")
-        val id = parts.getOrNull(1) ?: return true
+        var streamFound = false
 
-        val embedUrls = mutableListOf<String>()
-        if (isTv) {
-            val s = parts.getOrNull(2) ?: "1"
-            val e = parts.getOrNull(3) ?: "1"
-            embedUrls.add("https://vixsrc.to/embed/tv/$id/$s/$e")
-            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1&s=$s&e=$e")
-            embedUrls.add("https://vidlink.pro/tv/$id/$s/$e")
-            embedUrls.add("https://vidsrc.to/embed/tv/$id/$s/$e")
-        } else {
-            embedUrls.add("https://vixsrc.to/embed/movie/$id")
-            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1")
-            embedUrls.add("https://vidlink.pro/movie/$id")
-            embedUrls.add("https://vidsrc.to/embed/movie/$id")
+        try {
+            val res = app.get(
+                data,
+                headers = mapOf(
+                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                    "Referer" to "$mainUrl/",
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+                )
+            )
+
+            val html = res.text
+            val srcMatch = Regex("""const\s+src\s*=\s*['"]([^'"]+)['"]""").find(html)?.groupValues?.get(1)
+            if (srcMatch != null) {
+                val fullUrl = if (srcMatch.startsWith("http")) srcMatch else "$mainUrl$srcMatch"
+                callback.invoke(
+                    newExtractorLink(
+                        source = this.name,
+                        name = "${this.name} 1080p",
+                        url = fullUrl,
+                        type = ExtractorLinkType.M3U8
+                    ) {
+                        this.referer = "$mainUrl/"
+                        this.quality = Qualities.P1080.value
+                    }
+                )
+                streamFound = true
+            }
+
+            // Subtitle tracks
+            val tracksMatch = Regex("""tracksData\s*=\s*(\{[\s\S]+?\});""").find(html)?.groupValues?.get(1)
+            if (tracksMatch != null) {
+                try {
+                    val tracksObj = JSONObject(tracksMatch)
+                    val tracksArr = tracksObj.optJSONArray("tracks")
+                    if (tracksArr != null) {
+                        for (i in 0 until tracksArr.length()) {
+                            val track = tracksArr.getJSONObject(i)
+                            val file = track.optString("file")
+                            val label = track.optString("label", "Türkçe")
+                            if (file.isNotEmpty()) {
+                                val trackUrl = if (file.startsWith("http")) file else "$mainUrl$file"
+                                subtitleCallback.invoke(
+                                    newSubtitleFile(
+                                        lang = label,
+                                        url = trackUrl
+                                    )
+                                )
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+        } catch (_: Exception) {}
+
+        // Fallback to third party extractors if needed
+        if (!streamFound) {
+            val parts = data.replace("$mainUrl/", "").split("/")
+            val isTv = parts.getOrNull(0) == "dizi"
+            val id = parts.getOrNull(1)
+            if (id != null) {
+                val s = parts.getOrNull(2) ?: "1"
+                val e = parts.getOrNull(3) ?: "1"
+                val embedUrls = if (isTv) {
+                    listOf(
+                        "https://vixsrc.to/embed/tv/$id/$s/$e",
+                        "https://vidlink.pro/tv/$id/$s/$e",
+                        "https://vidsrc.to/embed/tv/$id/$s/$e"
+                    )
+                } else {
+                    listOf(
+                        "https://vixsrc.to/embed/movie/$id",
+                        "https://vidlink.pro/movie/$id",
+                        "https://vidsrc.to/embed/movie/$id"
+                    )
+                }
+                for (embed in embedUrls) {
+                    try {
+                        loadExtractor(embed, subtitleCallback, callback)
+                    } catch (_: Exception) {}
+                }
+            }
         }
 
-        for (embed in embedUrls) {
-            try {
-                loadExtractor(embed, subtitleCallback, callback)
-            } catch (e: Exception) {}
-        }
-        return true
+        return streamFound
     }
 }
