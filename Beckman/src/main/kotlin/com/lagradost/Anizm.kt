@@ -85,7 +85,7 @@ class Beckman : MainAPI() {
         }
 
         if (results.isEmpty()) {
-            return getMainPage(1, MainPageRequest("Son Eklenen Animeler", "${mainUrl}/api/anime")).items
+            return getMainPage(1, MainPageRequest("Son Eklenen Animeler", "${mainUrl}/api/anime", false)).items.flatMap { it.list }
         }
         return results
     }

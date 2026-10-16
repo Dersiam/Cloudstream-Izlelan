@@ -101,7 +101,7 @@ class Bogard : MainAPI() {
         }
 
         if (items.isEmpty()) {
-            return getMainPage(1, MainPageRequest("Günün Trendleri", mainPage[0].data)).items
+            return getMainPage(1, MainPageRequest("Günün Trendleri", mainPage[0].data, false)).items.flatMap { it.list }
         }
         return items
     }
