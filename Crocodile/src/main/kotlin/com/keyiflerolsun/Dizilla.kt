@@ -22,24 +22,53 @@ class Crocodile : MainAPI() {
     override val supportedTypes = setOf(TvType.TvSeries, TvType.Movie)
 
     override val mainPage = mainPageOf(
-        "${mainUrl}/diziler" to "Popüler Diziler",
-        "${mainUrl}/filmler" to "Popüler Filmler",
-        "${mainUrl}/trendler" to "Trendler",
-        "${mainUrl}/arsiv" to "Arşiv",
+        "${mainUrl}/yabanci-dizi-izle" to "Yabancı Diziler",
+        "${mainUrl}/anime-izle" to "Animeler",
+        "${mainUrl}/kdrama-izle" to "K-Drama",
+        "${mainUrl}/arsiv" to "Arşiv & Keşfet"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val pageUrl = if (page > 1) "${request.data}?page=${page}" else request.data
-        val document = app.get(pageUrl).document
-        val home = document.select("a[href*='/dizi/'], a[href*='/film/']")
-            .filter { a ->
-                val href = a.attr("href")
-                !href.contains("/tur/") && !href.contains("/yil/") && !href.contains("/kategori/") && !href.contains("/sezon-")
+        val items = mutableListOf<SearchResponse>()
+        try {
+            val doc = app.get(pageUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")).document
+            val script = doc.selectFirst("script#__NEXT_DATA__")?.html()
+            if (script != null) {
+                val json = JSONObject(script)
+                val pageProps = json.optJSONObject("props")?.optJSONObject("pageProps")
+                val encData = pageProps?.optString("initialSeries") ?: ""
+                if (encData.isNotEmpty()) {
+                    val decrypted = decryptAes(encData)
+                    if (decrypted != null) {
+                        val arr = JSONArray(decrypted)
+                        for (i in 0 until arr.length()) {
+                            val item = arr.getJSONObject(i)
+                            val title = item.optString("used_title").ifEmpty { item.optString("original_title") }
+                            val slug = item.optString("used_slug").ifEmpty { item.optString("slug") }
+                            if (title.isEmpty() || slug.isEmpty()) continue
+                            val poster = fixUrlNull(item.optString("poster_url").ifEmpty { item.optString("face_url") })
+                            val href = fixUrlNull("$mainUrl/$slug") ?: continue
+                            items.add(newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
+                                this.posterUrl = poster
+                            })
+                        }
+                    }
+                }
             }
-            .mapNotNull { it.toSearchResult() }
-            .distinctBy { it.url }
+            if (items.isEmpty()) {
+                val fallback = doc.select("a[href*='/dizi/'], a[href*='/film/']")
+                    .filter { a ->
+                        val href = a.attr("href")
+                        !href.contains("/tur/") && !href.contains("/yil/") && !href.contains("/kategori/") && !href.contains("/sezon-")
+                    }
+                    .mapNotNull { it.toSearchResult() }
+                    .distinctBy { it.url }
+                items.addAll(fallback)
+            }
+        } catch (_: Exception) {}
 
-        return newHomePageResponse(request.name, home)
+        return newHomePageResponse(request.name, items.distinctBy { it.url })
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
@@ -143,7 +172,7 @@ class Crocodile : MainAPI() {
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
     override suspend fun load(url: String): LoadResponse? {
-        val document = app.get(url).document
+        val document = app.get(url, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")).document
         val script = document.selectFirst("script#__NEXT_DATA__")?.html()
         val isTv = url.contains("/dizi/")
 
@@ -151,61 +180,58 @@ class Crocodile : MainAPI() {
             try {
                 val json = JSONObject(script)
                 val props = json.optJSONObject("props")?.optJSONObject("pageProps")
-                val content = props?.optJSONObject("content")
-                    ?: props?.optJSONObject("series")
-                    ?: props?.optJSONObject("movie")
+                val encSecure = props?.optString("secureData") ?: ""
+                if (encSecure.isNotEmpty()) {
+                    val decrypted = decryptAes(encSecure)
+                    if (decrypted != null) {
+                        val secObj = JSONObject(decrypted)
+                        val contentItem = secObj.optJSONObject("contentItem")
+                        val title = contentItem?.optString("used_title")?.ifEmpty { contentItem.optString("original_title") } ?: name
+                        val poster = fixUrlNull(contentItem?.optString("poster_url")?.ifEmpty { contentItem.optString("face_url") })
+                        val plot = contentItem?.optString("description")
+                        val year = contentItem?.optInt("release_year")
 
-                if (content != null) {
-                    val title = content.optString("title").ifEmpty { content.optString("name") }
-                    val poster = fixUrlNull(content.optString("poster_url"))
-                    val plot = content.optString("overview").ifEmpty { content.optString("description") }
-                    val year = content.optString("release_year").take(4).toIntOrNull()
-
-                    if (isTv) {
-                        val seasonsArr = content.optJSONArray("seasons")
+                        val seasonEpisodesObj = secObj.optJSONObject("getSerieSeasonAndEpisodes")
+                        val seasonsArr = seasonEpisodesObj?.optJSONArray("result")
                         val episodes = mutableListOf<Episode>()
+
                         if (seasonsArr != null) {
                             for (s in 0 until seasonsArr.length()) {
                                 val sObj = seasonsArr.getJSONObject(s)
-                                val sNum = sObj.optInt("season_number", 1)
-                                val epArr = sObj.optJSONArray("episodes")
-                                if (epArr != null) {
-                                    for (e in 0 until epArr.length()) {
-                                        val epObj = epArr.getJSONObject(e)
-                                        val eNum = epObj.optInt("episode_number", e + 1)
-                                        val epSlug = epObj.optString("slug")
-                                        val epUrl = fixUrlNull("$mainUrl/$epSlug") ?: "$url/sezon-$sNum/bolum-$eNum"
-                                        val epName = epObj.optString("name").ifEmpty { "$sNum. Sezon $eNum. Bölüm" }
-                                        episodes.add(newEpisode(epUrl) {
-                                            this.name = epName
-                                            this.season = sNum
-                                            this.episode = eNum
-                                        })
-                                    }
+                                val sNum = sObj.optInt("season_no", s + 1)
+                                val epArr = sObj.optJSONArray("episodes") ?: continue
+                                for (e in 0 until epArr.length()) {
+                                    val epObj = epArr.getJSONObject(e)
+                                    val eNum = epObj.optInt("episode_no", e + 1)
+                                    val epSlug = epObj.optString("used_slug")
+                                    val epName = epObj.optString("episode_text").ifEmpty { "$sNum. Sezon $eNum. Bölüm" }
+                                    val epUrl = fixUrlNull("$mainUrl/$epSlug") ?: "$url/sezon-$sNum/bolum-$eNum"
+
+                                    episodes.add(newEpisode(epUrl) {
+                                        this.name = epName
+                                        this.season = sNum
+                                        this.episode = eNum
+                                    })
                                 }
                             }
                         }
+
                         if (episodes.isEmpty()) {
-                            episodes.add(newEpisode("$url/sezon-1/bolum-1") {
+                            episodes.add(newEpisode(url) {
                                 this.name = "1. Sezon 1. Bölüm"
                                 this.season = 1
                                 this.episode = 1
                             })
                         }
+
                         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-                            this.posterUrl = poster
-                            this.plot = plot
-                            this.year = year
-                        }
-                    } else {
-                        return newMovieLoadResponse(title, url, TvType.Movie, url) {
                             this.posterUrl = poster
                             this.plot = plot
                             this.year = year
                         }
                     }
                 }
-            } catch (e: Exception) {}
+            } catch (_: Exception) {}
         }
 
         val title = document.selectFirst("h1")?.text()?.trim() ?: name
@@ -216,7 +242,7 @@ class Crocodile : MainAPI() {
         if (isTv) {
             val episodes = mutableListOf<Episode>()
             val epElements = document.select("a[href*='/sezon-'][href*='/bolum-']")
-            val epRegex = Regex("""sezon-(\\d+)/bolum-(\\d+)""")
+            val epRegex = Regex("""sezon-(\d+)/bolum-(\d+)""")
             for (a in epElements) {
                 val epHref = fixUrlNull(a.attr("href")) ?: continue
                 val match = epRegex.find(epHref)
@@ -253,11 +279,46 @@ class Crocodile : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val document = app.get(data).document
-        val iframes = document.select("iframe").mapNotNull { fixUrlNull(it.attr("src")) }
-        for (iframe in iframes) {
-            loadExtractor(iframe, subtitleCallback, callback)
-        }
+        try {
+            val doc = app.get(data, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")).document
+            val script = doc.selectFirst("script#__NEXT_DATA__")?.html()
+            val iframes = mutableListOf<String>()
+
+            if (script != null) {
+                try {
+                    val json = JSONObject(script)
+                    val encSecure = json.optJSONObject("props")?.optJSONObject("pageProps")?.optString("secureData") ?: ""
+                    if (encSecure.isNotEmpty()) {
+                        val decrypted = decryptAes(encSecure)
+                        if (decrypted != null) {
+                            val secObj = JSONObject(decrypted)
+                            val sourcesArr = secObj.optJSONObject("getEpisodeSources")?.optJSONArray("result")
+                            if (sourcesArr != null) {
+                                for (i in 0 until sourcesArr.length()) {
+                                    val srcItem = sourcesArr.getJSONObject(i)
+                                    val contentHtml = srcItem.optString("source_content")
+                                    val iframeSrc = Regex("""src=["']([^"']+)["']""").find(contentHtml)?.groupValues?.get(1)
+                                    if (iframeSrc != null) {
+                                        val fullIframe = if (iframeSrc.startsWith("//")) "https:$iframeSrc" else fixUrl(iframeSrc)
+                                        iframes.add(fullIframe)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+
+            // Also check standard DOM iframes
+            doc.select("iframe").mapNotNull { fixUrlNull(it.attr("src")) }.forEach { iframes.add(it) }
+
+            for (iframe in iframes.distinct()) {
+                try {
+                    loadExtractor(iframe, data, subtitleCallback, callback)
+                } catch (_: Exception) {}
+            }
+        } catch (_: Exception) {}
+
         return true
     }
 }
