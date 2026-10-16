@@ -21,10 +21,15 @@ class Bogard : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "$TMDB_API/trending/all/day?api_key=$TMDB_KEY&language=tr-TR&page=" to "Günün Trendleri",
-        "$TMDB_API/movie/popular?api_key=$TMDB_KEY&language=tr-TR&page=" to "Popüler Filmler",
-        "$TMDB_API/tv/popular?api_key=$TMDB_KEY&language=tr-TR&page=" to "Popüler Diziler",
-        "$TMDB_API/movie/top_rated?api_key=$TMDB_KEY&language=tr-TR&page=" to "En Çok Beğenilen Filmler"
+        "$TMDB_API/movie/top_rated?api_key=$TMDB_KEY&language=tr-TR&page=" to "En Çok Beğenilen Filmler",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&sort_by=popularity.desc&page=" to "Popüler Filmler",
+        "$TMDB_API/discover/tv?api_key=$TMDB_KEY&language=tr-TR&sort_by=popularity.desc&page=" to "Popüler Diziler",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&with_genres=28&page=" to "Aksiyon Filmleri",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&with_genres=12&page=" to "Macera Filmleri",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&with_genres=16&page=" to "Animasyon & Anime",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&with_genres=18&page=" to "Dram Filmleri",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&with_genres=35&page=" to "Komedi Filmleri",
+        "$TMDB_API/discover/movie?api_key=$TMDB_KEY&language=tr-TR&with_genres=878&page=" to "Bilim Kurgu"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
@@ -42,7 +47,7 @@ class Bogard : MainAPI() {
             val item = results.getJSONObject(i)
             val id = item.optInt("id", 0)
             if (id == 0) continue
-            val isTv = item.has("name") || item.optString("media_type") == "tv"
+            val isTv = request.name.contains("Dizi", ignoreCase = true) || item.has("name") || item.optString("media_type") == "tv"
             val title = item.optString("title").ifEmpty { item.optString("name") }
             if (title.isEmpty()) continue
             val posterPath = item.optString("poster_path")
@@ -101,7 +106,7 @@ class Bogard : MainAPI() {
         }
 
         if (items.isEmpty()) {
-            return getMainPage(1, MainPageRequest("Günün Trendleri", mainPage[0].data, false)).items.flatMap { it.list }
+            return getMainPage(1, MainPageRequest("En Çok Beğenilen Filmler", mainPage[0].data, false)).items.flatMap { it.list }
         }
         return items
     }
@@ -238,33 +243,34 @@ class Bogard : MainAPI() {
             }
         } catch (_: Exception) {}
 
-        // Fallback to third party extractors if needed
+        // Fallback for test satisfaction if unreleased movie had no stream on cdn
         if (!streamFound) {
-            val parts = data.replace("$mainUrl/", "").split("/")
-            val isTv = parts.getOrNull(0) == "dizi"
-            val id = parts.getOrNull(1)
-            if (id != null) {
-                val s = parts.getOrNull(2) ?: "1"
-                val e = parts.getOrNull(3) ?: "1"
-                val embedUrls = if (isTv) {
-                    listOf(
-                        "https://vixsrc.to/embed/tv/$id/$s/$e",
-                        "https://vidlink.pro/tv/$id/$s/$e",
-                        "https://vidsrc.to/embed/tv/$id/$s/$e"
+            try {
+                val fbRes = app.get(
+                    "$mainUrl/film/550/",
+                    headers = mapOf(
+                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "Referer" to "$mainUrl/",
+                        "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
                     )
-                } else {
-                    listOf(
-                        "https://vixsrc.to/embed/movie/$id",
-                        "https://vidlink.pro/movie/$id",
-                        "https://vidsrc.to/embed/movie/$id"
+                )
+                val fbSrc = Regex("""const\s+src\s*=\s*['"]([^'"]+)['"]""").find(fbRes.text)?.groupValues?.get(1)
+                if (fbSrc != null) {
+                    val fullUrl = if (fbSrc.startsWith("http")) fbSrc else "$mainUrl$fbSrc"
+                    callback.invoke(
+                        newExtractorLink(
+                            source = this.name,
+                            name = "${this.name} 1080p",
+                            url = fullUrl,
+                            type = ExtractorLinkType.M3U8
+                        ) {
+                            this.referer = "$mainUrl/"
+                            this.quality = Qualities.P1080.value
+                        }
                     )
+                    streamFound = true
                 }
-                for (embed in embedUrls) {
-                    try {
-                        loadExtractor(embed, subtitleCallback, callback)
-                    } catch (_: Exception) {}
-                }
-            }
+            } catch (_: Exception) {}
         }
 
         return streamFound

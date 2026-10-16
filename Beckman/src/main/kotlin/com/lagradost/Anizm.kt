@@ -2,10 +2,10 @@
 package com.lagradost
 
 import android.util.Log
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import org.json.JSONObject
+import org.json.JSONArray
 
 class Beckman : MainAPI() {
     override var mainUrl = "https://api.sonanime.com"
@@ -20,69 +20,72 @@ class Beckman : MainAPI() {
         TvType.OVA
     )
 
-    private data class AnimeItem(
-        @JsonProperty("anime_id") val animeId: Int? = null,
-        @JsonProperty("anime_name") val animeName: String? = null,
-        @JsonProperty("anime_name_en") val animeNameEn: String? = null,
-        @JsonProperty("anime_type") val animeType: String? = null,
-        @JsonProperty("anime_description") val animeDescription: String? = null,
-        @JsonProperty("anime_year") val animeYear: String? = null,
-        @JsonProperty("anime_malScore") val animeMalScore: Double? = null,
-        @JsonProperty("anime_photo") val animePhoto: String? = null,
-        @JsonProperty("anime_link") val animeLink: String? = null
-    )
-
-    private data class EpisodeItem(
-        @JsonProperty("id") val id: Int? = null,
-        @JsonProperty("anime_id") val animeId: Int? = null,
-        @JsonProperty("anime_season") val animeSeason: Int? = null,
-        @JsonProperty("episode_number") val episodeNumber: Int? = null,
-        @JsonProperty("episode_link_1080") val link1080: String? = null,
-        @JsonProperty("episode_link_720") val link720: String? = null,
-        @JsonProperty("episode_link_480") val link480: String? = null,
-        @JsonProperty("episode_link_360") val link360: String? = null
-    )
-
-    private data class AnimeDetail(
-        @JsonProperty("anime_id") val animeId: Int? = null,
-        @JsonProperty("anime_name") val animeName: String? = null,
-        @JsonProperty("anime_description") val animeDescription: String? = null,
-        @JsonProperty("anime_year") val animeYear: String? = null,
-        @JsonProperty("anime_photo") val animePhoto: String? = null,
-        @JsonProperty("anime_link") val animeLink: String? = null,
-        @JsonProperty("episodes") val episodes: List<EpisodeItem>? = null
-    )
-
     override val mainPage = mainPageOf(
-        "${mainUrl}/api/anime" to "Son Eklenen Animeler"
+        "${mainUrl}/api/anime" to "Son Eklenen Animeler",
+        "${mainUrl}/api/anime#popular" to "En Çok Beğenilenler",
+        "${mainUrl}/api/anime#action" to "Aksiyon Animeleri",
+        "${mainUrl}/api/anime#adventure" to "Macera Animeleri",
+        "${mainUrl}/api/anime#comedy" to "Komedi Animeleri",
+        "${mainUrl}/api/anime#fantasy" to "Fantastik Animeleri"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val animes = app.get(request.data).parsedSafe<List<AnimeItem>>() ?: emptyList()
-        val home = animes.mapNotNull { item ->
-            val link = item.animeLink ?: return@mapNotNull null
-            val title = item.animeName ?: item.animeNameEn ?: link
+        val targetUrl = request.data.substringBefore("#")
+        val tag = request.data.substringAfter("#", "")
+        val res = app.get(targetUrl).text
+        val jsonArray = JSONArray(res)
+        val home = mutableListOf<SearchResponse>()
+
+        for (i in 0 until jsonArray.length()) {
+            val item = jsonArray.getJSONObject(i)
+            val link = item.optString("anime_link")
+            if (link.isEmpty()) continue
+
+            val genres = item.optString("anime_genres", "")
+            val score = item.optDouble("anime_malScore", 0.0)
+
+            val match = when (tag) {
+                "popular" -> score >= 8.0
+                "action" -> genres.contains("Action", ignoreCase = true)
+                "adventure" -> genres.contains("Adventure", ignoreCase = true)
+                "comedy" -> genres.contains("Comedy", ignoreCase = true)
+                "fantasy" -> genres.contains("Fantasy", ignoreCase = true)
+                else -> true
+            }
+
+            if (!match) continue
+
+            val title = item.optString("anime_name").ifEmpty { item.optString("anime_name_en") }.ifEmpty { link }
+            val photo = item.optString("anime_photo")
             val url = "${mainUrl}/api/anime/link/$link"
 
-            newAnimeSearchResponse(title, url, TvType.Anime) {
-                this.posterUrl = item.animePhoto
-            }
+            home.add(newAnimeSearchResponse(title, url, TvType.Anime) {
+                this.posterUrl = photo
+            })
+            if (home.size >= 30) break
         }
+
         return newHomePageResponse(request.name, home)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
         val searchUrl = "${mainUrl}/api/anime/search?q=${query.trim()}"
-        val animes = app.get(searchUrl).parsedSafe<List<AnimeItem>>() ?: emptyList()
-        val results = animes.mapNotNull { item ->
-            val link = item.animeLink ?: return@mapNotNull null
-            val title = item.animeName ?: item.animeNameEn ?: link
-            val url = "${mainUrl}/api/anime/link/$link"
-
-            newAnimeSearchResponse(title, url, TvType.Anime) {
-                this.posterUrl = item.animePhoto
+        val results = mutableListOf<SearchResponse>()
+        try {
+            val res = app.get(searchUrl).text
+            val jsonArray = JSONArray(res)
+            for (i in 0 until jsonArray.length()) {
+                val item = jsonArray.getJSONObject(i)
+                val link = item.optString("anime_link")
+                if (link.isEmpty()) continue
+                val title = item.optString("anime_name").ifEmpty { item.optString("anime_name_en") }.ifEmpty { link }
+                val photo = item.optString("anime_photo")
+                val url = "${mainUrl}/api/anime/link/$link"
+                results.add(newAnimeSearchResponse(title, url, TvType.Anime) {
+                    this.posterUrl = photo
+                })
             }
-        }
+        } catch (_: Exception) {}
 
         if (results.isEmpty()) {
             return getMainPage(1, MainPageRequest("Son Eklenen Animeler", "${mainUrl}/api/anime", false)).items.flatMap { it.list }
@@ -92,52 +95,65 @@ class Beckman : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse? {
         val apiUrl = if (url.startsWith("http")) url else "${mainUrl}/api/anime/link/$url"
-        val detail = app.get(apiUrl).parsedSafe<AnimeDetail>() ?: return null
+        val res = app.get(apiUrl).text
+        val detail = JSONObject(res)
 
-        val title = detail.animeName ?: "Anime"
-        val poster = detail.animePhoto
-        val plot = detail.animeDescription
-        val year = detail.animeYear?.toIntOrNull()
+        val title = detail.optString("anime_name").ifEmpty { "Anime" }
+        val poster = detail.optString("anime_photo")
+        val plot = detail.optString("anime_description")
+        val year = detail.optString("anime_year").toIntOrNull()
 
-        var episodeList = detail.episodes?.filter { ep ->
-            listOfNotNull(ep.link1080, ep.link720, ep.link480, ep.link360).any { it.isNotBlank() }
-        }?.mapNotNull { ep ->
-            val epNum = ep.episodeNumber ?: return@mapNotNull null
-            val season = ep.animeSeason ?: 1
+        val episodeList = mutableListOf<Episode>()
+        val episodesArr = detail.optJSONArray("episodes")
+        if (episodesArr != null) {
+            for (i in 0 until episodesArr.length()) {
+                val ep = episodesArr.getJSONObject(i)
+                val epNum = ep.optInt("episode_number", i + 1)
+                val season = ep.optInt("anime_season", 1)
 
-            val linksJson = JSONObject().apply {
-                ep.link1080?.let { put("1080", it) }
-                ep.link720?.let { put("720", it) }
-                ep.link480?.let { put("480", it) }
-                ep.link360?.let { put("360", it) }
-            }.toString()
+                val link1080 = ep.optString("episode_link_1080", "")
+                val link720 = ep.optString("episode_link_720", "")
+                val link480 = ep.optString("episode_link_480", "")
+                val link360 = ep.optString("episode_link_360", "")
 
-            newEpisode(linksJson) {
-                this.name = "Bölüm $epNum"
-                this.season = season
-                this.episode = epNum
+                val linksJson = JSONObject().apply {
+                    if (link1080.isNotEmpty() && link1080 != "null") put("1080", link1080)
+                    if (link720.isNotEmpty() && link720 != "null") put("720", link720)
+                    if (link480.isNotEmpty() && link480 != "null") put("480", link480)
+                    if (link360.isNotEmpty() && link360 != "null") put("360", link360)
+                }
+
+                if (linksJson.length() > 0) {
+                    episodeList.add(newEpisode(linksJson.toString()) {
+                        this.name = "Bölüm $epNum"
+                        this.season = season
+                        this.episode = epNum
+                    })
+                }
             }
-        } ?: emptyList()
+        }
 
         if (episodeList.isEmpty()) {
-            val fallbackDetail = app.get("${mainUrl}/api/anime/link/lupin-iii").parsedSafe<AnimeDetail>()
-            episodeList = fallbackDetail?.episodes?.filter { ep ->
-                listOfNotNull(ep.link1080, ep.link720, ep.link480, ep.link360).any { it.isNotBlank() }
-            }?.mapNotNull { ep ->
-                val epNum = ep.episodeNumber ?: return@mapNotNull null
-                val linksJson = JSONObject().apply {
-                    ep.link1080?.let { put("1080", it) }
-                    ep.link720?.let { put("720", it) }
-                    ep.link480?.let { put("480", it) }
-                    ep.link360?.let { put("360", it) }
-                }.toString()
-
-                newEpisode(linksJson) {
-                    this.name = "Bölüm $epNum"
-                    this.season = 1
-                    this.episode = epNum
+            try {
+                val fallbackRes = app.get("${mainUrl}/api/anime/link/lupin-iii").text
+                val fbDetail = JSONObject(fallbackRes)
+                val fbEps = fbDetail.optJSONArray("episodes")
+                if (fbEps != null) {
+                    for (i in 0 until fbEps.length()) {
+                        val ep = fbEps.getJSONObject(i)
+                        val epNum = ep.optInt("episode_number", i + 1)
+                        val link480 = ep.optString("episode_link_480", "")
+                        if (link480.isNotEmpty() && link480 != "null") {
+                            val linksJson = JSONObject().put("480", link480)
+                            episodeList.add(newEpisode(linksJson.toString()) {
+                                this.name = "Bölüm $epNum"
+                                this.season = 1
+                                this.episode = epNum
+                            })
+                        }
+                    }
                 }
-            } ?: emptyList()
+            } catch (_: Exception) {}
         }
 
         return newAnimeLoadResponse(title, url, TvType.Anime) {
@@ -159,8 +175,8 @@ class Beckman : MainAPI() {
             if (data.startsWith("{")) {
                 val json = JSONObject(data)
                 listOf("1080", "720", "480", "360").forEach { quality ->
-                    val videoUrl = json.optString(quality, null)
-                    if (!videoUrl.isNullOrBlank()) {
+                    val videoUrl = json.optString(quality, "")
+                    if (videoUrl.isNotEmpty() && videoUrl != "null") {
                         callback.invoke(
                             newExtractorLink(
                                 source = this.name,
