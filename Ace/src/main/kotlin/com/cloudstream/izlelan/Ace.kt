@@ -41,7 +41,6 @@ class Ace : MainAPI() {
         val finalItems = if (items.isNotEmpty()) {
             items
         } else {
-            // Fallback to home cards
             doc.select("article").mapNotNull { article ->
                 val a = article.selectFirst("a[href]") ?: return@mapNotNull null
                 a.toSearchResult()
@@ -182,17 +181,44 @@ class Ace : MainAPI() {
                         "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
                         "X-Requested-With" to "XMLHttpRequest",
                         "Referer" to data,
-                        "Content-Type" to "application/x-www-form-urlencoded"
+                        "Origin" to mainUrl,
+                        "Content-Type" to "application/x-www-form-urlencoded; charset=UTF-8"
                     ),
-                    data = mapOf("players_show" to token)
+                    data = mapOf("players" to token)
                 )
 
                 val array = JSONArray(ajaxRes.text)
                 for (i in 0 until array.length()) {
                     val serverObj = array.getJSONObject(i)
+                    val serverName = serverObj.optString("name", "Server")
                     val embedLink = serverObj.optString("link")
                     if (embedLink.isNotEmpty()) {
                         try {
+                            if (embedLink.contains("kaembed.net") || embedLink.contains("vidmoly") || serverName.contains("Vidmoly", ignoreCase = true)) {
+                                val sHtml = app.get(
+                                    embedLink,
+                                    headers = mapOf(
+                                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                                        "Referer" to "$mainUrl/"
+                                    )
+                                ).text
+                                val m3u8 = Regex("""(https?://[^\s"'<>]+\.m3u8[^\s"'<>]*)""").find(sHtml)?.groupValues?.get(1)
+                                if (m3u8 != null) {
+                                    callback.invoke(
+                                        newExtractorLink(
+                                            source = name,
+                                            name = "$name - $serverName",
+                                            url = m3u8,
+                                            type = ExtractorLinkType.M3U8
+                                        ) {
+                                            headers = mapOf(
+                                                "Referer" to "https://kaembed.net/",
+                                                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+                                            )
+                                        }
+                                    )
+                                }
+                            }
                             loadExtractor(embedLink, subtitleCallback, callback)
                         } catch (e: Exception) {}
                     }
