@@ -1,89 +1,129 @@
 @file:Suppress("DEPRECATION", "DEPRECATION_ERROR", "UNCHECKED_CAST")
 package com.cloudstream.izlelan
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
+import org.json.JSONObject
 
 class Shamrock : MainAPI() {
-    override var mainUrl = "https://animezer.com"
+    override var mainUrl = "https://api.sonanime.com"
     override var name = "Shamrock"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = true
-    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
+    override val supportedTypes = setOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA)
 
-    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
-        val document = app.get(mainUrl).document
-        val items = document.select("div.movie, article, div.film, div.item, div.poster-box").mapNotNull { it.toSearchResult() }
-        return newHomePageResponse(name, items)
-    }
+    private data class AnimeItem(
+        @JsonProperty("anime_id") val animeId: Int? = null,
+        @JsonProperty("anime_name") val animeName: String? = null,
+        @JsonProperty("anime_name_en") val animeNameEn: String? = null,
+        @JsonProperty("anime_type") val animeType: String? = null,
+        @JsonProperty("anime_photo") val animePhoto: String? = null,
+        @JsonProperty("anime_link") val animeLink: String? = null
+    )
 
-    private fun Element.toSearchResult(): SearchResponse? {
-        val linkElem = if (this.tagName() == "a") this else this.selectFirst("a") ?: return null
-        val href = fixUrlNull(linkElem.attr("href")) ?: return null
-        if (href == mainUrl || href == "$mainUrl/") return null
+    private data class EpisodeItem(
+        @JsonProperty("id") val id: Int? = null,
+        @JsonProperty("anime_id") val animeId: Int? = null,
+        @JsonProperty("anime_season") val animeSeason: Int? = null,
+        @JsonProperty("episode_number") val episodeNumber: Int? = null,
+        @JsonProperty("episode_link_1080") val link1080: String? = null,
+        @JsonProperty("episode_link_720") val link720: String? = null,
+        @JsonProperty("episode_link_480") val link480: String? = null,
+        @JsonProperty("episode_link_360") val link360: String? = null
+    )
 
-        val title = this.selectFirst("div.title, h2, h3, h4, .title, a.title")?.text()?.trim()
-            ?: linkElem.attr("title").ifEmpty { null }
-            ?: return null
+    private data class AnimeDetail(
+        @JsonProperty("anime_id") val animeId: Int? = null,
+        @JsonProperty("anime_name") val animeName: String? = null,
+        @JsonProperty("anime_description") val animeDescription: String? = null,
+        @JsonProperty("anime_year") val animeYear: String? = null,
+        @JsonProperty("anime_photo") val animePhoto: String? = null,
+        @JsonProperty("anime_link") val animeLink: String? = null,
+        @JsonProperty("episodes") val episodes: List<EpisodeItem>? = null
+    )
 
-        val poster = fixUrlNull(this.selectFirst("img")?.let {
-            it.attr("data-src").ifEmpty { it.attr("data-original").ifEmpty { it.attr("src") } }
-        })
+    override val mainPage = mainPageOf(
+        "$mainUrl/api/anime" to "Son Eklenen Animeler"
+    )
 
-        val isTv = href.contains("/dizi") || href.contains("/series") || href.contains("/sezon")
-        return if (isTv) {
-            newTvSeriesSearchResponse(title, href, TvType.TvSeries) { this.posterUrl = poster }
-        } else {
-            newMovieSearchResponse(title, href, TvType.Movie) { this.posterUrl = poster }
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        val animes = app.get(request.data).parsedSafe<List<AnimeItem>>() ?: emptyList()
+        val home = animes.mapNotNull { item ->
+            val link = item.animeLink ?: return@mapNotNull null
+            val title = item.animeName ?: item.animeNameEn ?: link
+            val url = "$mainUrl/api/anime/link/$link"
+
+            newAnimeSearchResponse(title, url, TvType.Anime) {
+                this.posterUrl = item.animePhoto
+            }
         }
+        return newHomePageResponse(request.name, home)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val searchUrl = "$mainUrl/?s=$query"
-        val document = app.get(searchUrl).document
-        return document.select("div.result-item, div.movie, article, div.film, div.item, div.poster-box, li:has(a)").mapNotNull { it.toSearchResult() }
-    }
+        return try {
+            val searchUrl = "$mainUrl/api/anime/search?q=${query.trim()}"
+            val animes = app.get(searchUrl).parsedSafe<List<AnimeItem>>() ?: emptyList()
+            val results = animes.mapNotNull { item ->
+                val link = item.animeLink ?: return@mapNotNull null
+                val title = item.animeName ?: item.animeNameEn ?: link
+                val url = "$mainUrl/api/anime/link/$link"
 
-    override suspend fun load(url: String): LoadResponse? {
-        val document = app.get(url).document
-        val title = document.selectFirst("h1")?.text()?.trim() ?: name
-        val poster = fixUrlNull(document.selectFirst("div.poster img, img.poster, div.img img")?.let {
-            it.attr("data-src").ifEmpty { it.attr("src") }
-        })
-        val description = document.selectFirst("div.description, p.overview, div.summary, div.content p")?.text()?.trim()
-
-        val episodeElements = document.select("a[href*='-sezon-'], a[href*='-bolum-'], a[href*='/bolum/'], a.episode-link")
-        if (episodeElements.isNotEmpty()) {
-            val eps = mutableListOf<Episode>()
-            val epRegex = Regex("""(\d+)[.-]sezon[.-](\d+)[.-]bolum""")
-            val added = mutableSetOf<String>()
-
-            for (a in episodeElements) {
-                val epHref = fixUrlNull(a.attr("href")) ?: continue
-                if (!added.add(epHref)) continue
-                val match = epRegex.find(epHref)
-                val sNum = match?.groupValues?.get(1)?.toIntOrNull() ?: 1
-                val eNum = match?.groupValues?.get(2)?.toIntOrNull() ?: 1
-
-                eps.add(newEpisode(epHref) {
-                    this.name = a.text().trim().ifEmpty { "$sNum. Sezon $eNum. Bölüm" }
-                    this.season = sNum
-                    this.episode = eNum
-                })
-            }
-            if (eps.isNotEmpty()) {
-                return newTvSeriesLoadResponse(title, url, TvType.TvSeries, eps) {
-                    this.posterUrl = poster
-                    this.plot = description
+                newAnimeSearchResponse(title, url, TvType.Anime) {
+                    this.posterUrl = item.animePhoto
                 }
             }
+            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, "$mainUrl/api/anime")).items
+        } catch (e: Exception) {
+            getMainPage(1, MainPageRequest(name, "$mainUrl/api/anime")).items
+        }
+    }
+
+    override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
+
+    override suspend fun load(url: String): LoadResponse? {
+        val apiUrl = if (url.startsWith("http")) url else "$mainUrl/api/anime/link/$url"
+        val detail = app.get(apiUrl).parsedSafe<AnimeDetail>() ?: return null
+
+        val title = detail.animeName ?: name
+        val poster = detail.animePhoto
+        val plot = detail.animeDescription
+        val year = detail.animeYear?.toIntOrNull()
+
+        val episodeList = mutableListOf<Episode>()
+        detail.episodes?.forEach { ep ->
+            val epNum = ep.episodeNumber ?: return@forEach
+            val season = ep.animeSeason ?: 1
+
+            val linksJson = JSONObject().apply {
+                ep.link1080?.let { put("1080", it) }
+                ep.link720?.let { put("720", it) }
+                ep.link480?.let { put("480", it) }
+                ep.link360?.let { put("360", it) }
+            }.toString()
+
+            episodeList.add(newEpisode(linksJson) {
+                this.name = "$season. Sezon $epNum. Bölüm"
+                this.season = season
+                this.episode = epNum
+            })
         }
 
-        return newMovieLoadResponse(title, url, TvType.Movie, url) {
+        if (episodeList.isEmpty()) {
+            episodeList.add(newEpisode("{}") {
+                this.name = "1. Bölüm"
+                this.season = 1
+                this.episode = 1
+            })
+        }
+
+        return newAnimeLoadResponse(title, url, TvType.Anime) {
             this.posterUrl = poster
-            this.plot = description
+            this.plot = plot
+            this.year = year
+            addEpisodes(DubStatus.Subbed, episodeList)
         }
     }
 
@@ -93,28 +133,25 @@ class Shamrock : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val document = app.get(data).document
-        
-        // Find iframes
-        val iframes = document.select("iframe").mapNotNull { fixUrlNull(it.attr("data-src").ifEmpty { it.attr("src") }) }
-        for (iframe in iframes) {
-            loadExtractor(iframe, subtitleCallback, callback)
-        }
-
-        // Direct m3u8 / mp4 in script tags
-        for (script in document.select("script")) {
-            val scriptData = script.data()
-            if (scriptData.contains("file:") || scriptData.contains("source") || scriptData.contains(".m3u8")) {
-                val m3u8 = Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']""").find(scriptData)?.groupValues?.get(1)
-                if (m3u8 != null) {
+        try {
+            val json = JSONObject(data)
+            val qualities = listOf("1080", "720", "480", "360")
+            for (q in qualities) {
+                val link = json.optString(q, "")
+                if (link.isNotEmpty()) {
                     callback.invoke(
-                        newExtractorLink(name, name, m3u8, ExtractorLinkType.M3U8) {
+                        newExtractorLink(
+                            name,
+                            "$name $q" + "p",
+                            link,
+                            ExtractorLinkType.VIDEO
+                        ) {
                             headers = mapOf("Referer" to "$mainUrl/")
                         }
                     )
                 }
             }
-        }
+        } catch (e: Exception) {}
         return true
     }
 }

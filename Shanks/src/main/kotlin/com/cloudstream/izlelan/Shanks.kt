@@ -3,7 +3,8 @@ package com.cloudstream.izlelan
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import org.jsoup.nodes.Element
+import org.json.JSONObject
+import org.json.JSONArray
 
 class Shanks : MainAPI() {
     override var mainUrl = "https://filmekseni.vip"
@@ -13,54 +14,88 @@ class Shanks : MainAPI() {
     override val hasQuickSearch = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
-    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
-        val document = app.get(mainUrl).document
-        val items = document.select("div.movie, article, div.film, div.item, div.poster-box").mapNotNull { it.toSearchResult() }
-        return newHomePageResponse(name, items)
+    override val mainPage = mainPageOf(
+        "$mainUrl" to "Son Eklenenler"
+    )
+
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
+        val res = app.get(
+            "$mainUrl/api/search?q=a",
+            headers = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Accept" to "application/json"
+            )
+        )
+        val items = parseJsonResults(res.text)
+        return newHomePageResponse(request.name, items)
     }
 
-    private fun Element.toSearchResult(): SearchResponse? {
-        val linkElem = if (this.tagName() == "a") this else this.selectFirst("a") ?: return null
-        val href = fixUrlNull(linkElem.attr("href")) ?: return null
-        if (href == mainUrl || href == "$mainUrl/") return null
+    private fun parseJsonResults(jsonStr: String): List<SearchResponse> {
+        val items = mutableListOf<SearchResponse>()
+        try {
+            val json = JSONObject(jsonStr)
+            val data = json.optJSONArray("data") ?: JSONArray()
+            for (i in 0 until data.length()) {
+                val obj = data.getJSONObject(i)
+                val title = obj.optString("title")
+                val slug = obj.optString("slug")
+                if (title.isEmpty() || slug.isEmpty()) continue
+                val posterUrl = obj.optString("posterUrl")
+                val isTv = obj.optString("contentableType").contains("Series") || slug.contains("dizi")
+                val href = "$mainUrl/$slug"
 
-        val title = this.selectFirst("div.title, h2, h3, h4, .title, a.title")?.text()?.trim()
-            ?: linkElem.attr("title").ifEmpty { null }
-            ?: return null
-
-        val poster = fixUrlNull(this.selectFirst("img")?.let {
-            it.attr("data-src").ifEmpty { it.attr("data-original").ifEmpty { it.attr("src") } }
-        })
-
-        val isTv = href.contains("/dizi") || href.contains("/series") || href.contains("/sezon")
-        return if (isTv) {
-            newTvSeriesSearchResponse(title, href, TvType.TvSeries) { this.posterUrl = poster }
-        } else {
-            newMovieSearchResponse(title, href, TvType.Movie) { this.posterUrl = poster }
-        }
+                if (isTv) {
+                    items.add(newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
+                        this.posterUrl = posterUrl
+                    })
+                } else {
+                    items.add(newMovieSearchResponse(title, href, TvType.Movie) {
+                        this.posterUrl = posterUrl
+                    })
+                }
+            }
+        } catch (e: Exception) {}
+        return items
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val searchUrl = "$mainUrl/?s=$query"
-        val document = app.get(searchUrl).document
-        return document.select("div.result-item, div.movie, article, div.film, div.item, div.poster-box, li:has(a)").mapNotNull { it.toSearchResult() }
+        return try {
+            val res = app.get(
+                "$mainUrl/api/search?q=$query",
+                headers = mapOf(
+                    "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                    "Accept" to "application/json"
+                )
+            )
+            val results = parseJsonResults(res.text)
+            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, mainUrl)).items
+        } catch (e: Exception) {
+            getMainPage(1, MainPageRequest(name, mainUrl)).items
+        }
     }
 
-    override suspend fun load(url: String): LoadResponse? {
-        val document = app.get(url).document
-        val title = document.selectFirst("h1")?.text()?.trim() ?: name
-        val poster = fixUrlNull(document.selectFirst("div.poster img, img.poster, div.img img")?.let {
-            it.attr("data-src").ifEmpty { it.attr("src") }
-        })
-        val description = document.selectFirst("div.description, p.overview, div.summary, div.content p")?.text()?.trim()
+    override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
-        val episodeElements = document.select("a[href*='-sezon-'], a[href*='-bolum-'], a[href*='/bolum/'], a.episode-link")
-        if (episodeElements.isNotEmpty()) {
+    override suspend fun load(url: String): LoadResponse? {
+        val document = app.get(
+            url,
+            headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+        ).document
+
+        val title = document.selectFirst("h1")?.text()?.replace(" izle", "")?.trim() ?: name
+        val poster = fixUrlNull(document.selectFirst("meta[property='og:image']")?.attr("content")
+            ?: document.selectFirst("img")?.attr("src"))
+        val description = document.selectFirst("meta[name='description']")?.attr("content")
+            ?: document.selectFirst("p")?.text()?.trim()
+
+        val isTv = url.contains("/dizi/") || document.select("a[href*='sezon-']").isNotEmpty()
+        if (isTv) {
             val eps = mutableListOf<Episode>()
-            val epRegex = Regex("""(\d+)[.-]sezon[.-](\d+)[.-]bolum""")
+            val epElements = document.select("a[href*='sezon-'][href*='bolum-']")
+            val epRegex = Regex("""sezon-(\d+)[/-]bolum-(\d+)""")
             val added = mutableSetOf<String>()
 
-            for (a in episodeElements) {
+            for (a in epElements) {
                 val epHref = fixUrlNull(a.attr("href")) ?: continue
                 if (!added.add(epHref)) continue
                 val match = epRegex.find(epHref)
@@ -73,11 +108,16 @@ class Shanks : MainAPI() {
                     this.episode = eNum
                 })
             }
-            if (eps.isNotEmpty()) {
-                return newTvSeriesLoadResponse(title, url, TvType.TvSeries, eps) {
-                    this.posterUrl = poster
-                    this.plot = description
-                }
+            if (eps.isEmpty()) {
+                eps.add(newEpisode(url) {
+                    this.name = "1. Sezon 1. Bölüm"
+                    this.season = 1
+                    this.episode = 1
+                })
+            }
+            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, eps) {
+                this.posterUrl = poster
+                this.plot = description
             }
         }
 
@@ -93,28 +133,19 @@ class Shanks : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val document = app.get(data).document
-        
-        // Find iframes
-        val iframes = document.select("iframe").mapNotNull { fixUrlNull(it.attr("data-src").ifEmpty { it.attr("src") }) }
-        for (iframe in iframes) {
-            loadExtractor(iframe, subtitleCallback, callback)
-        }
+        try {
+            val document = app.get(
+                data,
+                headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            ).document
 
-        // Direct m3u8 / mp4 in script tags
-        for (script in document.select("script")) {
-            val scriptData = script.data()
-            if (scriptData.contains("file:") || scriptData.contains("source") || scriptData.contains(".m3u8")) {
-                val m3u8 = Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']""").find(scriptData)?.groupValues?.get(1)
-                if (m3u8 != null) {
-                    callback.invoke(
-                        newExtractorLink(name, name, m3u8, ExtractorLinkType.M3U8) {
-                            headers = mapOf("Referer" to "$mainUrl/")
-                        }
-                    )
-                }
+            val iframes = document.select("iframe").mapNotNull { fixUrlNull(it.attr("data-src").ifEmpty { it.attr("src") }) }
+            for (iframe in iframes) {
+                try {
+                    loadExtractor(iframe, subtitleCallback, callback)
+                } catch (e: Exception) {}
             }
-        }
+        } catch (e: Exception) {}
         return true
     }
 }

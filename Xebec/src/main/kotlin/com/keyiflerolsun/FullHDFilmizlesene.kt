@@ -69,9 +69,20 @@ class Xebec : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val document = app.get("${mainUrl}/arama/${query}").document
-
-        return document.select("li.film").mapNotNull { it.toSearchResult() }
+        return try {
+            val document = app.get(
+                "${mainUrl}/arama/${query}",
+                headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            ).document
+            val results = document.select("li.film").mapNotNull { it.toSearchResult() }
+            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, mainUrl)).items
+        } catch (e: Exception) {
+            try {
+                getMainPage(1, MainPageRequest(name, mainUrl)).items
+            } catch (e2: Exception) {
+                emptyList()
+            }
+        }
     }
 
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)

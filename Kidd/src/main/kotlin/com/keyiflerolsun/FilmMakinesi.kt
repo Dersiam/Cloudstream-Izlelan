@@ -1,204 +1,179 @@
 @file:Suppress("DEPRECATION", "DEPRECATION_ERROR", "UNCHECKED_CAST")
-// ! Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
-
 package com.keyiflerolsun
 
-import android.util.Log
-import com.lagradost.cloudstream3.Actor
-import com.lagradost.cloudstream3.Episode
-import com.lagradost.cloudstream3.HomePageResponse
-import com.lagradost.cloudstream3.LoadResponse
-import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
-import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
-import com.lagradost.cloudstream3.MainAPI
-import com.lagradost.cloudstream3.MainPageRequest
-import com.lagradost.cloudstream3.SearchResponse
-import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.TvType
-import com.lagradost.cloudstream3.USER_AGENT
-import com.lagradost.cloudstream3.app
-import com.lagradost.cloudstream3.fixUrlNull
-import com.lagradost.cloudstream3.mainPageOf
-import com.lagradost.cloudstream3.newEpisode
-import com.lagradost.cloudstream3.newHomePageResponse
-import com.lagradost.cloudstream3.newMovieLoadResponse
-import com.lagradost.cloudstream3.newMovieSearchResponse
-import com.lagradost.cloudstream3.newTvSeriesLoadResponse
-import com.lagradost.cloudstream3.newTvSeriesSearchResponse
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.loadExtractor
-import org.jsoup.nodes.Element
-
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.utils.*
+import org.json.JSONObject
+import org.json.JSONArray
 
 class Kidd : MainAPI() {
     override var mainUrl = "https://filmmakinesi.to"
     override var name = "Kidd"
     override val hasMainPage = true
     override var lang = "tr"
-    override val hasQuickSearch = false
+    override val hasQuickSearch = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
-    // ! CloudFlare bypass
-    override var sequentialMainPage = true
-    override var sequentialMainPageDelay = 50L
-    override var sequentialMainPageScrollDelay = 50L
+    companion object {
+        private const val TMDB_API = "https://api.themoviedb.org/3"
+        private const val TMDB_KEY = "500330721680edb6d5f7f12ba7cd9023"
+        private const val IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
+    }
 
     override val mainPage = mainPageOf(
-        "${mainUrl}/filmler/sayfa/" to "Son Filmler",
-        "${mainUrl}/film-izle/olmeden-izlenmesi-gerekenler/sayfa/" to "Ölmeden İzle",
-        "${mainUrl}/tur/aksiyon/film/sayfa/" to "Aksiyon",
-        "${mainUrl}/tur/bilim-kurgu/film/sayfa/" to "Bilim Kurgu",
-        "${mainUrl}/tur/macera/film/sayfa/" to "Macera",
-        "${mainUrl}/tur/komedi/film/sayfa/" to "Komedi",
-        "${mainUrl}/tur/romantik/film/sayfa/" to "Romantik",
-        "${mainUrl}/tur/belgesel/film/sayfa/" to "Belgesel",
-        "${mainUrl}/tur/fantastik/film/sayfa/" to "Fantastik",
-        "${mainUrl}/tur/polisiye/film/sayfa/" to "Polisiye Suç",
-        "${mainUrl}/tur/korku/film/sayfa/" to "Korku",
-        "${mainUrl}/tur/animasyon/film/sayfa/" to "Animasyon",
-        "${mainUrl}/tur/gizem/film/sayfa/" to "Gizem",
-
-        "${mainUrl}/yabanci-dizi-izle/sayfa/" to "Son Diziler",
-        "${mainUrl}/tur/aksiyon/dizi/sayfa/" to "Aksiyon Dizi",
-        "${mainUrl}/tur/bilim-kurgu/dizi/sayfa/" to "Bilim Kurgu Dizi",
-        "${mainUrl}/tur/macera/dizi/sayfa/" to "Macera Dizi",
-        "${mainUrl}/tur/komedi/dizi/sayfa/" to "Komedi Dizi",
-        "${mainUrl}/tur/romantik/dizi/sayfa/" to "Romantik Dizi",
-        "${mainUrl}/tur/belgesel/dizi/sayfa/" to "Belgesel Dizi",
-        "${mainUrl}/tur/fantastik/dizi/sayfa/" to "Fantastik Dizi",
-        "${mainUrl}/tur/polisiye/dizi/sayfa/" to "Polisiye Dizi",
-        "${mainUrl}/tur/korku/dizi/sayfa/" to "Korku Dizi",
-        "${mainUrl}/tur/animasyon/dizi/sayfa/" to "Animasyon Dizi",
-        "${mainUrl}/tur/gizem/dizi/sayfa/" to "Gizem Dizi",
-        //"${mainUrl}/kanal/netflix/sayfa/"                          to "Netflix",
+        "$TMDB_API/trending/movie/day?api_key=$TMDB_KEY&language=tr-TR&page=" to "Günün Trend Filmleri",
+        "$TMDB_API/movie/popular?api_key=$TMDB_KEY&language=tr-TR&page=" to "Popüler Filmler",
+        "$TMDB_API/movie/top_rated?api_key=$TMDB_KEY&language=tr-TR&page=" to "En Çok Beğenilen Filmler",
+        "$TMDB_API/trending/tv/day?api_key=$TMDB_KEY&language=tr-TR&page=" to "Popüler Diziler"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val cleanedUrl = request.data.removeSuffix("/")
-        val url = if (page > 1) {
-            "$cleanedUrl/$page"
-        } else {
-            cleanedUrl.replace(Regex("/sayfa/?$"), "")
-        }
-
-        val document = app.get(
-            url, headers = mapOf(
-                "User-Agent" to USER_AGENT,
-                "Referer" to mainUrl
+        val res = app.get(
+            "${request.data}$page",
+            headers = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Accept" to "application/json"
             )
-        ).document
+        )
+        val json = JSONObject(res.text)
+        val results = json.optJSONArray("results") ?: JSONArray()
+        val items = mutableListOf<SearchResponse>()
+        for (i in 0 until results.length()) {
+            val item = results.getJSONObject(i)
+            val id = item.optInt("id", 0)
+            if (id == 0) continue
+            val isTv = item.has("name") || item.optString("media_type") == "tv"
+            val title = item.optString("title").ifEmpty { item.optString("name") }
+            if (title.isEmpty()) continue
+            val posterPath = item.optString("poster_path")
+            val poster = if (posterPath.isNotEmpty() && posterPath != "null") "$IMAGE_BASE$posterPath" else null
+            val typeStr = if (isTv) "tv" else "movie"
+            val linkUrl = "$mainUrl/tmdb/$typeStr/$id"
 
-        val home = document.select("div.film-list div.item-relative")
-            .mapNotNull { it.toSearchResult() }
-
-        Log.d("FLMM", "Toplam film: ${home.size}")
-        return newHomePageResponse(request.name, home)
-    }
-
-    private fun Element.toSearchResult(): SearchResponse? {
-        val aTag = selectFirst("a.item") ?: return null
-        val title = aTag.attr("data-title").takeIf { it.isNotBlank() } ?: return null
-        val href = fixUrlNull(aTag.attr("href")) ?: return null
-        val posterUrl = fixUrlNull(aTag.selectFirst("img")?.attr("src"))
-
-        Log.d("FLMM", "Film: $title, Href: $href, Poster: $posterUrl")
-
-        return if (href.contains("/dizi/")) {
-            newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
-                this.posterUrl = posterUrl
-            }
-        } else {
-            newMovieSearchResponse(title, href, TvType.Movie) {
-                this.posterUrl = posterUrl
+            if (isTv) {
+                items.add(newTvSeriesSearchResponse(title, linkUrl, TvType.TvSeries) {
+                    this.posterUrl = poster
+                })
+            } else {
+                items.add(newMovieSearchResponse(title, linkUrl, TvType.Movie) {
+                    this.posterUrl = poster
+                })
             }
         }
-    }
-
-    private fun Element.toRecommendResult(): SearchResponse? {
-        val title = this.select("a").last()?.text() ?: return null
-        val href = fixUrlNull(this.select("a").last()?.attr("href")) ?: return null
-        val posterUrl = fixUrlNull(this.selectFirst("img")?.attr("src"))
-
-        return newMovieSearchResponse(title, href, TvType.Movie) { this.posterUrl = posterUrl }
+        return newHomePageResponse(request.name, items)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val document = app.get("${mainUrl}/arama/?s=${query}").document
+        val url = "$TMDB_API/search/multi?api_key=$TMDB_KEY&language=tr-TR&query=$query"
+        val res = app.get(
+            url,
+            headers = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "Accept" to "application/json"
+            )
+        )
+        val json = JSONObject(res.text)
+        val results = json.optJSONArray("results") ?: JSONArray()
+        val items = mutableListOf<SearchResponse>()
+        for (i in 0 until results.length()) {
+            val item = results.getJSONObject(i)
+            val id = item.optInt("id", 0)
+            if (id == 0) continue
+            val mediaType = item.optString("media_type")
+            if (mediaType != "movie" && mediaType != "tv") continue
+            val isTv = mediaType == "tv"
+            val title = item.optString("title").ifEmpty { item.optString("name") }
+            if (title.isEmpty()) continue
+            val posterPath = item.optString("poster_path")
+            val poster = if (posterPath.isNotEmpty() && posterPath != "null") "$IMAGE_BASE$posterPath" else null
+            val typeStr = if (isTv) "tv" else "movie"
+            val linkUrl = "$mainUrl/tmdb/$typeStr/$id"
 
-        return document.select("div.film-list div.item-relative").mapNotNull { it.toSearchResult() }
+            if (isTv) {
+                items.add(newTvSeriesSearchResponse(title, linkUrl, TvType.TvSeries) {
+                    this.posterUrl = poster
+                })
+            } else {
+                items.add(newMovieSearchResponse(title, linkUrl, TvType.Movie) {
+                    this.posterUrl = poster
+                })
+            }
+        }
+        if (items.isEmpty()) {
+            return getMainPage(1, MainPageRequest(name, "$TMDB_API/movie/popular?api_key=$TMDB_KEY&language=tr-TR&page=")).items
+        }
+        return items
     }
 
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
     override suspend fun load(url: String): LoadResponse? {
-        val document = app.get(url).document
+        val parts = url.substringAfter("/tmdb/").split("/")
+        val type = parts.getOrNull(0) ?: "movie"
+        val id = parts.getOrNull(1)?.toIntOrNull() ?: return null
 
-        val title = document.selectFirst("h1")?.text()?.trim() ?: return null
-        val poster = fixUrlNull(document.selectFirst("[property='og:image']")?.attr("content"))
-        val description = document.select("div.info-description p").last()?.text()?.trim()
-        val tags = document.selectFirst("dt:contains(Tür:) + dd")?.text()?.split(", ")
-        val rating =
-            document.selectFirst("dt:contains(IMDB Puanı:) + dd")?.text()?.trim()?.toIntOrNull()
-        val year =
-            document.selectFirst("dt:contains(Yapım Yılı:) + dd")?.text()?.trim()?.toIntOrNull()
+        val res = app.get(
+            "$TMDB_API/$type/$id?api_key=$TMDB_KEY&language=tr-TR",
+            headers = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                "Accept" to "application/json"
+            )
+        )
+        val json = JSONObject(res.text)
+        val title = json.optString("title").ifEmpty { json.optString("name") }
+        val overview = json.optString("overview")
+        val posterPath = json.optString("poster_path")
+        val poster = if (posterPath.isNotEmpty() && posterPath != "null") "$IMAGE_BASE$posterPath" else null
+        val year = json.optString("release_date").ifEmpty { json.optString("first_air_date") }.take(4).toIntOrNull()
+        val rating = json.optDouble("vote_average", 0.0).toFloat()
 
-        val durationElement =
-            document.select("dt:contains(Film Süresi:) + dd time").attr("datetime")
-        // ? ISO 8601 süre formatını ayrıştırma (örneğin "PT129M")
-        val duration = if (durationElement.startsWith("PT") && durationElement.endsWith("M")) {
-            durationElement.drop(2).dropLast(1).toIntOrNull() ?: 0
-        } else {
-            0
-        }
-
-        val recommendations =
-            document.select("div.film-list div.item-relative").mapNotNull { it.toRecommendResult() }
-        val actors =
-            document.selectFirst("dt:contains(Oyuncular:) + dd")?.text()?.split(", ")?.map {
-                Actor(it.trim())
+        if (type == "tv") {
+            val numSeasons = json.optInt("number_of_seasons", 1).coerceAtLeast(1)
+            val episodes = mutableListOf<Episode>()
+            val seasonsArr = json.optJSONArray("seasons")
+            val seasonEpCounts = mutableMapOf<Int, Int>()
+            if (seasonsArr != null) {
+                for (s in 0 until seasonsArr.length()) {
+                    val sObj = seasonsArr.getJSONObject(s)
+                    val sNum = sObj.optInt("season_number", -1)
+                    val epCount = sObj.optInt("episode_count", 0)
+                    if (sNum > 0 && epCount > 0) {
+                        seasonEpCounts[sNum] = epCount
+                    }
+                }
             }
-
-        val trailer =
-            fixUrlNull(document.selectXpath("//iframe[@title='Fragman']").attr("data-src"))
-
-        if (url.contains("/dizi/")) {
-            val eps = mutableListOf<Episode>()
-            document.select("div#sezonTabContent div.col-12").forEach { it ->
-                val epHref = it.selectFirst("a")?.attr("href")
-                val epName = it.selectFirst("div.ep-details span")?.text()
-                val epTitle = it.selectFirst("div.ep-title")?.text()?.split("/")
-                val epSeason = epTitle!![0].replace(". Sezon", "").trim().toIntOrNull()
-                val epEpisode = epTitle[1].replace(". Bölüm", "").trim().toIntOrNull()
-                eps.add(
-                    newEpisode(epHref) {
-                        this.name = epName
-                        this.season = epSeason
-                        this.episode = epEpisode
+            for (s in 1..numSeasons) {
+                val epCount = seasonEpCounts[s] ?: 10
+                for (e in 1..epCount) {
+                    episodes.add(newEpisode("$mainUrl/embed/tv/$id/$s/$e") {
+                        this.name = "$s. Sezon $e. Bölüm"
+                        this.season = s
+                        this.episode = e
                     })
+                }
             }
-            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, eps) {
+            if (episodes.isEmpty()) {
+                episodes.add(newEpisode("$mainUrl/embed/tv/$id/1/1") {
+                    this.name = "1. Sezon 1. Bölüm"
+                    this.season = 1
+                    this.episode = 1
+                })
+            }
+            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
+                this.plot = overview
                 this.year = year
-                this.plot = description
-                this.tags = tags
-                // this.rating = rating
-                addActors(actors)
-                addTrailer(trailer)
+                this.rating = rating.toInt()
             }
-        }
-        return newMovieLoadResponse(title, url, TvType.Movie, url) {
-            this.posterUrl = poster
-            this.year = year
-            this.plot = description
-            this.tags = tags
-            // this.rating = rating
-            this.duration = duration
-            this.recommendations = recommendations
-            addActors(actors)
-            addTrailer(trailer)
+        } else {
+            return newMovieLoadResponse(title, url, TvType.Movie, "$mainUrl/embed/movie/$id") {
+                this.posterUrl = poster
+                this.plot = overview
+                this.year = year
+                this.rating = rating.toInt()
+            }
         }
     }
-
 
     override suspend fun loadLinks(
         data: String,
@@ -206,13 +181,30 @@ class Kidd : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        Log.d("FLMM", "data » $data")
-        val document = app.get(data).document
-        val iframe = document.selectFirst("iframe")?.attr("data-src") ?: ""
-        Log.d("FLMM", iframe)
+        val isTv = data.contains("/embed/tv/")
+        val parts = data.substringAfter("/embed/").split("/")
+        val id = parts.getOrNull(1) ?: return true
 
-        loadExtractor(iframe, "${mainUrl}/", subtitleCallback, callback)
+        val embedUrls = mutableListOf<String>()
+        if (isTv) {
+            val s = parts.getOrNull(2) ?: "1"
+            val e = parts.getOrNull(3) ?: "1"
+            embedUrls.add("https://vixsrc.to/embed/tv/$id/$s/$e")
+            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1&s=$s&e=$e")
+            embedUrls.add("https://vidlink.pro/tv/$id/$s/$e")
+            embedUrls.add("https://vidsrc.to/embed/tv/$id/$s/$e")
+        } else {
+            embedUrls.add("https://vixsrc.to/embed/movie/$id")
+            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1")
+            embedUrls.add("https://vidlink.pro/movie/$id")
+            embedUrls.add("https://vidsrc.to/embed/movie/$id")
+        }
 
+        for (embed in embedUrls) {
+            try {
+                loadExtractor(embed, subtitleCallback, callback)
+            } catch (e: Exception) {}
+        }
         return true
     }
 }
