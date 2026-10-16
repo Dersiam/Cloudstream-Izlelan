@@ -2,14 +2,14 @@
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Ace.cs3",
         "status": 1,
-        "version": 3,
+        "version": 5,
         "name": "Ace",
         "internalName": "Ace",
         "authors": [
             "izlelan"
         ],
         "description": "Film \u2022 Dizi - [https://arc018.stream]",
-        "fileSize": 12600,
+        "fileSize": 17898,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -18,19 +18,19 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-d26bc2473cdf438e427b979376a68a8c31e20eb554a888c3ddb8fd522419e12f"
+        "fileHash": "sha256-3d25757c0e5ea87b8f1c8914976eecd5a9c07f28f03c9546e84cf95aa94cf1a8"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Beckman.cs3",
         "status": 1,
-        "version": 4,
+        "version": 5,
         "name": "Beckman",
         "internalName": "Beckman",
         "authors": [
             "izlelan"
         ],
         "description": "Anime - [https://api.sonanime.com]",
-        "fileSize": 19191,
+        "fileSize": 14142,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -39,19 +39,19 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-9f88ab92914b170e65821d138ec98685bc9a2c83650d24033af828f84be6e7a7"
+        "fileHash": "sha256-6d315bd1fc744ae010a4cdee40d23ad9b3b4796096583441609f6ad2d4e3d34b"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Bogard.cs3",
         "status": 1,
-        "version": 4,
+        "version": 5,
         "name": "Bogard",
         "internalName": "Bogard",
         "authors": [
             "izlelan"
         ],
         "description": "Film \u2022 Dizi - [https://streamcorecdn.com]",
-        "fileSize": 16107,
+        "fileSize": 16264,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -60,19 +60,19 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-04bc2af7e30810ae4030df83082be3994e5e57799120109cf8fa4c96b5b9f980"
+        "fileHash": "sha256-60ac865f41a6a7f99e25467d3096de07a0d7614eb72ee98808e00ece10747ad0"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Clover.cs3",
         "status": 1,
-        "version": 4,
+        "version": 5,
         "name": "Clover",
         "internalName": "Clover",
         "authors": [
             "izlelan"
         ],
         "description": "Film \u2022 Dizi - [https://japierdolevid.com]",
-        "fileSize": 16558,
+        "fileSize": 16547,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -81,7 +81,7 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-2a013b3f6fdf6100f6c3921fad264f21b2ee7a4395e568ada1e88b11497dd59f"
+        "fileHash": "sha256-debc7c6bc4a7447dabe71d34cfcbb4fd8a8b6736f19a93772e449a001447000d"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Crocodile.cs3",
