@@ -3,8 +3,9 @@ package com.cloudstream.izlelan
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
-import org.json.JSONObject
+import org.jsoup.nodes.Element
 import org.json.JSONArray
+import org.json.JSONObject
 
 class Ace : MainAPI() {
     override var mainUrl = "https://arc018.stream"
@@ -14,160 +15,151 @@ class Ace : MainAPI() {
     override val hasQuickSearch = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
-    companion object {
-        private const val TMDB_API = "https://api.themoviedb.org/3"
-        private const val TMDB_KEY = "500330721680edb6d5f7f12ba7cd9023"
-        private const val IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
-    }
-
     override val mainPage = mainPageOf(
-        "$TMDB_API/trending/all/day?api_key=$TMDB_KEY&language=tr-TR&page=" to "Günün Trendleri",
-        "$TMDB_API/movie/popular?api_key=$TMDB_KEY&language=tr-TR&page=" to "Popüler Filmler",
-        "$TMDB_API/tv/popular?api_key=$TMDB_KEY&language=tr-TR&page=" to "Popüler Diziler",
-        "$TMDB_API/movie/top_rated?api_key=$TMDB_KEY&language=tr-TR&page=" to "En Çok Beğenilen Filmler"
+        "$mainUrl/watch-movies-online/?page=" to "Filmler",
+        "$mainUrl/watch-series-online/?page=" to "Diziler",
+        "$mainUrl/top-imdb/?page=" to "En Çok Beğenilenler"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val res = app.get(
-            "${request.data}$page",
-            headers = mapOf(
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                "Accept" to "application/json"
-            )
-        )
-        val json = JSONObject(res.text)
-        val results = json.optJSONArray("results") ?: JSONArray()
-        val items = mutableListOf<SearchResponse>()
-        for (i in 0 until results.length()) {
-            val item = results.getJSONObject(i)
-            val id = item.optInt("id", 0)
-            if (id == 0) continue
-            val isTv = item.has("name") || item.optString("media_type") == "tv"
-            val title = item.optString("title").ifEmpty { item.optString("name") }
-            if (title.isEmpty()) continue
-            val posterPath = item.optString("poster_path")
-            val poster = if (posterPath.isNotEmpty() && posterPath != "null") "$IMAGE_BASE$posterPath" else null
-            val typeStr = if (isTv) "tv" else "movie"
-            val linkUrl = "$mainUrl/tmdb/$typeStr/$id"
+        val targetUrl = if (request.data.startsWith("http")) {
+            "${request.data}$page"
+        } else {
+            "$mainUrl/watch-movies-online/?page=$page"
+        }
 
-            if (isTv) {
-                items.add(newTvSeriesSearchResponse(title, linkUrl, TvType.TvSeries) {
-                    this.posterUrl = poster
-                })
-            } else {
-                items.add(newMovieSearchResponse(title, linkUrl, TvType.Movie) {
-                    this.posterUrl = poster
-                })
+        val doc = try {
+            app.get(targetUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+        } catch (e: Exception) {
+            app.get("$mainUrl/home", headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+        }
+
+        val items = doc.select("a[href*='/watch-movie/'], a[href*='/watch-series/'], a[href*='/episode/']").mapNotNull { a ->
+            a.toSearchResult()
+        }.distinctBy { it.url }
+
+        val finalItems = if (items.isNotEmpty()) {
+            items
+        } else {
+            // Fallback to home cards
+            doc.select("article").mapNotNull { article ->
+                val a = article.selectFirst("a[href]") ?: return@mapNotNull null
+                a.toSearchResult()
+            }.distinctBy { it.url }
+        }
+
+        return newHomePageResponse(request.name, finalItems)
+    }
+
+    private fun Element.toSearchResult(): SearchResponse? {
+        val link = fixUrlNull(this.attr("href")) ?: return null
+        if (!link.contains("/watch-movie/") && !link.contains("/watch-series/") && !link.contains("/episode/")) {
+            return null
+        }
+
+        val title = this.selectFirst("h3, h2, .ep-label")?.text()?.trim()
+            ?: this.selectFirst("img")?.attr("alt")?.trim()
+            ?: this.attr("aria-label").trim().ifEmpty { null }
+            ?: return null
+
+        val poster = fixUrlNull(this.selectFirst("img")?.let {
+            it.attr("src").ifEmpty { it.attr("data-src") }
+        })
+
+        val isTv = link.contains("/watch-series/") || link.contains("/episode/")
+        return if (isTv) {
+            newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+                this.posterUrl = poster
+            }
+        } else {
+            newMovieSearchResponse(title, link, TvType.Movie) {
+                this.posterUrl = poster
             }
         }
-        return newHomePageResponse(request.name, items)
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val url = "$TMDB_API/search/multi?api_key=$TMDB_KEY&language=tr-TR&query=$query"
-        val res = app.get(
-            url,
-            headers = mapOf(
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                "Accept" to "application/json"
-            )
-        )
-        val json = JSONObject(res.text)
-        val results = json.optJSONArray("results") ?: JSONArray()
-        val items = mutableListOf<SearchResponse>()
-        for (i in 0 until results.length()) {
-            val item = results.getJSONObject(i)
-            val id = item.optInt("id", 0)
-            if (id == 0) continue
-            val mediaType = item.optString("media_type")
-            if (mediaType != "movie" && mediaType != "tv") continue
-            val isTv = mediaType == "tv"
-            val title = item.optString("title").ifEmpty { item.optString("name") }
-            if (title.isEmpty()) continue
-            val posterPath = item.optString("poster_path")
-            val poster = if (posterPath.isNotEmpty() && posterPath != "null") "$IMAGE_BASE$posterPath" else null
-            val typeStr = if (isTv) "tv" else "movie"
-            val linkUrl = "$mainUrl/tmdb/$typeStr/$id"
+        val searchUrl = "$mainUrl/search?keyword=${query.trim()}"
+        val results = mutableListOf<SearchResponse>()
+        try {
+            val doc = app.get(searchUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+            val items = doc.select("a[href*='/watch-movie/'], a[href*='/watch-series/']").mapNotNull {
+                it.toSearchResult()
+            }.distinctBy { it.url }
+            results.addAll(items)
+        } catch (e: Exception) {}
 
-            if (isTv) {
-                items.add(newTvSeriesSearchResponse(title, linkUrl, TvType.TvSeries) {
-                    this.posterUrl = poster
-                })
-            } else {
-                items.add(newMovieSearchResponse(title, linkUrl, TvType.Movie) {
-                    this.posterUrl = poster
-                })
-            }
+        if (results.isEmpty()) {
+            try {
+                val home = getMainPage(1, MainPageRequest(name, "$mainUrl/watch-movies-online/?page=", false))
+                return home.items.flatMap { it.list }
+            } catch (e: Exception) {}
         }
-        return items
+        return results
     }
 
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
     override suspend fun load(url: String): LoadResponse? {
-        val parts = url.substringAfter("/tmdb/").split("/")
-        val type = parts.getOrNull(0) ?: "movie"
-        val id = parts.getOrNull(1)?.toIntOrNull() ?: return null
+        val doc = app.get(url, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+        val rawTitle = doc.selectFirst("h1")?.text()?.trim() ?: name
+        val cleanTitle = rawTitle.replace(Regex("""(?i)Watch Online\s*"""), "")
+            .replace(Regex("""(?i)\s*with English Subtitels.*"""), "")
+            .replace(Regex("""(?i)\s*•\s*Free HD.*"""), "")
+            .trim()
 
-        val res = app.get(
-            "$TMDB_API/$type/$id?api_key=$TMDB_KEY&language=tr-TR",
-            headers = mapOf(
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                "Accept" to "application/json"
-            )
-        )
-        val json = JSONObject(res.text)
-        val title = json.optString("title").ifEmpty { json.optString("name") }
-        val overview = json.optString("overview")
-        val posterPath = json.optString("poster_path")
-        val poster = if (posterPath.isNotEmpty() && posterPath != "null") "$IMAGE_BASE$posterPath" else null
-        val year = json.optString("release_date").ifEmpty { json.optString("first_air_date") }.take(4).toIntOrNull()
-        val rating = json.optDouble("vote_average", 0.0).toFloat()
+        val poster = fixUrlNull(doc.selectFirst("meta[property='og:image']")?.attr("content")
+            ?: doc.selectFirst("section[aria-label='Video player']")?.attr("data-backdrop")
+            ?: doc.selectFirst("img[alt='Poster']")?.attr("src"))
 
-        if (type == "tv") {
-            val numSeasons = json.optInt("number_of_seasons", 1).coerceAtLeast(1)
+        val plot = doc.selectFirst("p.text-white\\/80, div.synopsis, meta[name='description']")?.let {
+            if (it.tagName() == "meta") it.attr("content") else it.text().trim()
+        }
+
+        val year = Regex("""\((\d{4})\)""").find(rawTitle)?.groupValues?.get(1)?.toIntOrNull()
+
+        val isTv = url.contains("/watch-series/") || url.contains("/episode/")
+        if (isTv) {
+            val epElements = doc.select("a[href*='/episode/']")
             val episodes = mutableListOf<Episode>()
-            val seasonsArr = json.optJSONArray("seasons")
-            val seasonEpCounts = mutableMapOf<Int, Int>()
-            if (seasonsArr != null) {
-                for (s in 0 until seasonsArr.length()) {
-                    val sObj = seasonsArr.getJSONObject(s)
-                    val sNum = sObj.optInt("season_number", -1)
-                    val epCount = sObj.optInt("episode_count", 0)
-                    if (sNum > 0 && epCount > 0) {
-                        seasonEpCounts[sNum] = epCount
-                    }
-                }
+            val epRegex = Regex("""/s(\d+)-e(\d+)/?""")
+            val added = mutableSetOf<String>()
+
+            for (a in epElements) {
+                val epHref = fixUrlNull(a.attr("href")) ?: continue
+                if (!added.add(epHref)) continue
+
+                val match = epRegex.find(epHref)
+                val sNum = match?.groupValues?.get(1)?.toIntOrNull() ?: 1
+                val eNum = match?.groupValues?.get(2)?.toIntOrNull() ?: 1
+                val epName = a.selectFirst(".ep-label")?.text()?.trim()?.ifEmpty { null }
+                    ?: a.text().trim().ifEmpty { "$sNum. Sezon $eNum. Bölüm" }
+
+                episodes.add(newEpisode(epHref) {
+                    this.name = epName
+                    this.season = sNum
+                    this.episode = eNum
+                })
             }
-            for (s in 1..numSeasons) {
-                val epCount = seasonEpCounts[s] ?: 10
-                for (e in 1..epCount) {
-                    episodes.add(newEpisode("$mainUrl/embed/tv/$id/$s/$e") {
-                        this.name = "$s. Sezon $e. Bölüm"
-                        this.season = s
-                        this.episode = e
-                    })
-                }
-            }
+
             if (episodes.isEmpty()) {
-                episodes.add(newEpisode("$mainUrl/embed/tv/$id/1/1") {
+                episodes.add(newEpisode(url) {
                     this.name = "1. Sezon 1. Bölüm"
                     this.season = 1
                     this.episode = 1
                 })
             }
-            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+
+            return newTvSeriesLoadResponse(cleanTitle, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
-                this.plot = overview
+                this.plot = plot
                 this.year = year
-                this.rating = rating.toInt()
             }
         } else {
-            return newMovieLoadResponse(title, url, TvType.Movie, "$mainUrl/embed/movie/$id") {
+            return newMovieLoadResponse(cleanTitle, url, TvType.Movie, url) {
                 this.posterUrl = poster
-                this.plot = overview
+                this.plot = plot
                 this.year = year
-                this.rating = rating.toInt()
             }
         }
     }
@@ -178,30 +170,42 @@ class Ace : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val isTv = data.contains("/embed/tv/")
-        val parts = data.substringAfter("/embed/").split("/")
-        val id = parts.getOrNull(1) ?: return true
+        try {
+            val doc = app.get(data, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+            val token = doc.selectFirst("section[aria-label='Video player']")?.attr("data-token")
+                ?: Regex("""data-token=["']([^"']+)["']""").find(doc.html())?.groupValues?.get(1)
 
-        val embedUrls = mutableListOf<String>()
-        if (isTv) {
-            val s = parts.getOrNull(2) ?: "1"
-            val e = parts.getOrNull(3) ?: "1"
-            embedUrls.add("https://vixsrc.to/embed/tv/$id/$s/$e")
-            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1&s=$s&e=$e")
-            embedUrls.add("https://vidlink.pro/tv/$id/$s/$e")
-            embedUrls.add("https://vidsrc.to/embed/tv/$id/$s/$e")
-        } else {
-            embedUrls.add("https://vixsrc.to/embed/movie/$id")
-            embedUrls.add("https://multiembed.mov/?video_id=$id&tmdb=1")
-            embedUrls.add("https://vidlink.pro/movie/$id")
-            embedUrls.add("https://vidsrc.to/embed/movie/$id")
-        }
+            if (!token.isNullOrEmpty()) {
+                val ajaxRes = app.post(
+                    "$mainUrl/ajax/ajax.php",
+                    headers = mapOf(
+                        "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                        "X-Requested-With" to "XMLHttpRequest",
+                        "Referer" to data,
+                        "Content-Type" to "application/x-www-form-urlencoded"
+                    ),
+                    data = mapOf("players_show" to token)
+                )
 
-        for (embed in embedUrls) {
-            try {
-                loadExtractor(embed, subtitleCallback, callback)
-            } catch (e: Exception) {}
-        }
+                val array = JSONArray(ajaxRes.text)
+                for (i in 0 until array.length()) {
+                    val serverObj = array.getJSONObject(i)
+                    val embedLink = serverObj.optString("link")
+                    if (embedLink.isNotEmpty()) {
+                        try {
+                            loadExtractor(embedLink, subtitleCallback, callback)
+                        } catch (e: Exception) {}
+                    }
+                }
+            }
+
+            val iframes = doc.select("iframe").mapNotNull { fixUrlNull(it.attr("src")) }
+            for (iframe in iframes) {
+                try {
+                    loadExtractor(iframe, subtitleCallback, callback)
+                } catch (e: Exception) {}
+            }
+        } catch (e: Exception) {}
         return true
     }
 }
