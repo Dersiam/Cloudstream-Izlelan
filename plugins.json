@@ -2,14 +2,14 @@
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Ace.cs3",
         "status": 1,
-        "version": 5,
+        "version": 3,
         "name": "Ace",
         "internalName": "Ace",
         "authors": [
             "izlelan"
         ],
         "description": "Film \u2022 Dizi - [https://arc018.stream]",
-        "fileSize": 17610,
+        "fileSize": 12600,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -18,7 +18,7 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-d67fd4b3439273b5b4f2af3ce00046360a5e067573125af1d1e2408788678722"
+        "fileHash": "sha256-d26bc2473cdf438e427b979376a68a8c31e20eb554a888c3ddb8fd522419e12f"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Beckman.cs3",
