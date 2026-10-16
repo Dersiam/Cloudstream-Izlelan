@@ -86,14 +86,14 @@
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Crocodile.cs3",
         "status": 1,
-        "version": 3,
+        "version": 5,
         "name": "Crocodile",
         "internalName": "Crocodile",
         "authors": [
             "izlelan"
         ],
         "description": "Dizi - [https://dizilla.now]",
-        "fileSize": 27443,
+        "fileSize": 29711,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -102,19 +102,19 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-841106de13aa510aca3450d7889cf64da78a9f4e422fcab8f8dabbd6569a4f3b"
+        "fileHash": "sha256-1435e0a15d1b2e8af001aae14eba0e8b320f11bb7a78f683f74a32bc39a8e9f4"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Doflamingo.cs3",
         "status": 1,
-        "version": 3,
+        "version": 5,
         "name": "Doflamingo",
         "internalName": "Doflamingo",
         "authors": [
             "izlelan"
         ],
         "description": "Film \u2022 Dizi - [https://asyawatch.com]",
-        "fileSize": 12122,
+        "fileSize": 19123,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -123,19 +123,19 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-608a269abd6a6c917321727d9159ba1df45a77c6b27aeaf42f89096419dac05b"
+        "fileHash": "sha256-47727047add95b615b535e38cc29164d9367429c782f4796f0939f357209d13b"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Dragon.cs3",
         "status": 1,
-        "version": 3,
+        "version": 5,
         "name": "Dragon",
         "internalName": "Dragon",
         "authors": [
             "izlelan"
         ],
         "description": "Film \u2022 Dizi - [https://dizisol.com]",
-        "fileSize": 12607,
+        "fileSize": 16525,
         "repositoryUrl": "https://github.com/Dersiam/Cloudstream-Izlelan",
         "language": "tr",
         "tvTypes": [
@@ -144,7 +144,7 @@
         ],
         "iconUrl": "https://izlelan.com/favicon.ico",
         "apiVersion": 1,
-        "fileHash": "sha256-e53307ca5a6caedccb9fe5e6bdd752aa8a5e3a80917e8e9d9f43da00efe78400"
+        "fileHash": "sha256-434d3574da82a05d5198da59cf67e78af0d3062095378364d7f9cb44eccb3f04"
     },
     {
         "url": "https://raw.githubusercontent.com/Dersiam/Cloudstream-Izlelan/builds/Enel.cs3",
