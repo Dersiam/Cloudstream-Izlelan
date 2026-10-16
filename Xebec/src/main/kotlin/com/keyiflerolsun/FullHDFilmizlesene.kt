@@ -75,10 +75,10 @@ class Xebec : MainAPI() {
                 headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
             ).document
             val results = document.select("li.film").mapNotNull { it.toSearchResult() }
-            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, mainUrl)).items
+            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, mainUrl, false)).items
         } catch (e: Exception) {
             try {
-                getMainPage(1, MainPageRequest(name, mainUrl)).items
+                getMainPage(1, MainPageRequest(name, mainUrl, false)).items
             } catch (e2: Exception) {
                 emptyList()
             }

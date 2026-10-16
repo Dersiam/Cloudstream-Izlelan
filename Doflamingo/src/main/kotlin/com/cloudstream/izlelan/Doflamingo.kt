@@ -42,14 +42,22 @@ class Doflamingo : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        return try {
+        val searchResults = mutableListOf<SearchResponse>()
+        try {
             val searchUrl = "$mainUrl/?s=$query"
             val document = app.get(searchUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
             val results = document.select("a[href*='/dizi/'], a[href*='/film/']").mapNotNull { it.toSearchResult() }.distinctBy { it.url }
-            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, mainUrl)).items
-        } catch (e: Exception) {
-            getMainPage(1, MainPageRequest(name, mainUrl)).items
+            searchResults.addAll(results)
+        } catch (e: Exception) {}
+
+        if (searchResults.isEmpty()) {
+            try {
+                val doc = app.get(mainUrl, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
+                val homeItems = doc.select("a[href*='/dizi/'], a[href*='/film/']").mapNotNull { it.toSearchResult() }.distinctBy { it.url }
+                searchResults.addAll(homeItems)
+            } catch (e: Exception) {}
         }
+        return searchResults
     }
 
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
@@ -81,6 +89,7 @@ class Doflamingo : MainAPI() {
                     this.episode = eNum
                 })
             }
+
             if (eps.isEmpty()) {
                 eps.add(newEpisode(url) {
                     this.name = "1. Sezon 1. Bölüm"
@@ -88,6 +97,7 @@ class Doflamingo : MainAPI() {
                     this.episode = 1
                 })
             }
+
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, eps) {
                 this.posterUrl = poster
                 this.plot = description
@@ -108,13 +118,14 @@ class Doflamingo : MainAPI() {
     ): Boolean {
         try {
             val document = app.get(data, headers = mapOf("User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")).document
-            val iframes = document.select("iframe").mapNotNull { fixUrlNull(it.attr("data-src").ifEmpty { it.attr("src") }) }
+            val iframes = document.select("iframe").mapNotNull { fixUrlNull(it.attr("src")) }
+
             for (iframe in iframes) {
-                try {
-                    loadExtractor(iframe, subtitleCallback, callback)
-                } catch (e: Exception) {}
+                loadExtractor(iframe, subtitleCallback, callback)
             }
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            // ignore
+        }
         return true
     }
 }

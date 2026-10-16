@@ -194,7 +194,7 @@ class Enel : MainAPI() {
         val isDizi = url.contains("/dizi/")
 
         if (isDizi && rel != null) {
-            val episodes = mutableListOf<Episode>()
+            val episodes = mutableListOf<com.lagradost.cloudstream3.Episode>()
             val seasonsArr = rel.optJSONObject("getSerieSeasonAndEpisodes")?.optJSONArray("result")
             if (seasonsArr != null) {
                 for (s in 0 until seasonsArr.length()) {
@@ -217,6 +217,13 @@ class Enel : MainAPI() {
                 }
             }
 
+            if (episodes.isEmpty()) {
+                episodes.add(newEpisode(url) {
+                    this.name = "1. Sezon 1. Bölüm"
+                    this.season = 1
+                    this.episode = 1
+                })
+            }
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
                 this.year = year

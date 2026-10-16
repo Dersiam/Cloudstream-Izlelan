@@ -75,9 +75,9 @@ class Lili : MainAPI() {
                     this.posterUrl = item.animePhoto
                 }
             }
-            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, "$mainUrl/api/anime")).items
+            if (results.isNotEmpty()) results else getMainPage(1, MainPageRequest(name, "$mainUrl/api/anime", false)).items
         } catch (e: Exception) {
-            getMainPage(1, MainPageRequest(name, "$mainUrl/api/anime")).items
+            getMainPage(1, MainPageRequest(name, "$mainUrl/api/anime", false)).items
         }
     }
 
